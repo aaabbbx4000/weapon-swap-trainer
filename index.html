@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>V Rising Component Trainer</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Top Controls -->
+    <button class="settings-button" id="viewPBsBtn">View PBs</button>
+    <button class="settings-button" id="configBtn">Configure</button>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Component Trainer</h1>
+            <p class="subtitle">Train individual component speed</p>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <button id="startButton">Start Round</button>
+            <button id="stopButton" class="hidden">Stop Round</button>
+            <button id="resetButton">Reset All PBs</button>
+
+            <div class="round-size-control">
+                <label for="roundSizeInput">Components per round:</label>
+                <input type="number" id="roundSizeInput" min="1" max="9999" value="10">
+            </div>
+        </div>
+
+        <!-- Main Display Area -->
+        <div class="main-display">
+            <!-- Welcome Screen -->
+            <div id="welcomeScreen">
+                <h2 style="color: #00d9ff; margin-bottom: 20px;">Ready to train?</h2>
+                <p style="color: #a0a0a0; margin-bottom: 30px;">
+                    Complete random components as fast as you can.<br>
+                    Track your personal best for each component!
+                </p>
+            </div>
+
+            <!-- Countdown Screen -->
+            <div id="countdownScreen" class="hidden">
+                <div class="countdown" id="countdownNumber">3</div>
+            </div>
+
+            <!-- Training Screen -->
+            <div id="trainingScreen" class="hidden">
+                <div class="progress-info">
+                    <span id="roundProgress">Component 1 / 1</span>
+                </div>
+                <div class="component-display">
+                    <div class="component-name" id="componentName">Ready</div>
+                    <div id="keyIndicators"></div>
+                </div>
+                <div class="timer" id="timer">0.0s</div>
+                <div class="pb-display" id="pbDisplay"></div>
+            </div>
+
+            <!-- Results Screen -->
+            <div id="resultsScreen" class="hidden">
+                <div class="results-title">Round Complete!</div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Average Time</div>
+                        <div class="stat-value" id="avgTime">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Fastest</div>
+                        <div class="stat-value" id="fastestTime">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Slowest</div>
+                        <div class="stat-value" id="slowestTime">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">New PBs</div>
+                        <div class="stat-value" id="newPBCount">0</div>
+                    </div>
+                </div>
+                <div class="results-summary">
+                    <div id="resultsList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Times Sidebar -->
+    <div id="timesSidebar" style="display: none;">
+        <h3>Times</h3>
+        <div id="timesList"></div>
+    </div>
+
+    <!-- Personal Bests Modal -->
+    <div id="pbModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">Personal Bests</div>
+            <div class="pb-list" id="pbListContent"></div>
+            <button class="close-modal" id="closeModalBtn">Close</button>
+        </div>
+    </div>
+
+    <!-- Configuration Modal -->
+    <div id="configModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">Configure Components</div>
+
+            <!-- Import/Export -->
+            <div class="config-buttons">
+                <button id="importBtn">Import JSON</button>
+                <button id="exportBtn">Export JSON</button>
+            </div>
+
+            <!-- Add New Component -->
+            <div class="config-section">
+                <h3>Add New Component</h3>
+                <div class="add-component-form">
+                    <input type="text" id="newComponentKey" placeholder="Key (e.g. 1,e)">
+                    <input type="text" id="newComponentDesc" placeholder="Description (e.g. crossbow E)">
+                    <button id="addComponentBtn">Add</button>
+                </div>
+            </div>
+
+            <!-- Auto-Skip Settings -->
+            <div class="auto-skip-settings">
+                <h3>Auto-Skip Settings</h3>
+                <div class="auto-skip-checkbox">
+                    <input type="checkbox" id="autoAdvanceCheckbox">
+                    <label for="autoAdvanceCheckbox">
+                        Auto-skip to next component after time limit
+                    </label>
+                </div>
+                <div class="auto-skip-delay">
+                    <label for="autoAdvanceDelayInput">Time limit (seconds):</label>
+                    <input type="number" id="autoAdvanceDelayInput"
+                           min="0.1" max="10" step="0.1" value="3.0">
+                </div>
+            </div>
+
+            <!-- Components List -->
+            <div class="config-section">
+                <h3 id="componentsListHeader">Components</h3>
+                <div id="componentsList"></div>
+            </div>
+
+            <button class="close-modal" id="closeConfigBtn">Close</button>
+        </div>
+    </div>
+
+    <!-- Hidden File Input -->
+    <input type="file" id="importFileInput" accept=".json" style="display: none;">
+
+    <!-- JavaScript Modules -->
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
