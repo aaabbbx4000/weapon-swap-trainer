@@ -2,7 +2,7 @@
  * Application Configuration
  */
 
-export const CONFIG = {
+const CONFIG = {
     COUNTDOWN_START: 3,
     COUNTDOWN_INTERVAL: 1000,
     TIMER_UPDATE_INTERVAL: 10,
@@ -32,7 +32,7 @@ export const CONFIG = {
     }
 };
 
-export const DEFAULT_COMPONENTS = [
+const DEFAULT_COMPONENTS = [
     { key: "1,q", description: "greatsword attack" },
     { key: "2,LeftMouseButton", description: "crossbow auto" },
     { key: "2,e", description: "crossbow attack" },
@@ -47,14 +47,14 @@ export const DEFAULT_COMPONENTS = [
     { key: "7,e", description: "twinblades attack" }
 ];
 
-export const SCREENS = {
+const SCREENS = {
     WELCOME: 'welcomeScreen',
     COUNTDOWN: 'countdownScreen',
     TRAINING: 'trainingScreen',
     RESULTS: 'resultsScreen'
 };
 
-export const KEY_MAPPINGS = {
+const KEY_MAPPINGS = {
     ' ': 'SPACE',
     'LeftMouseButton': 'LEFT CLICK'
 };

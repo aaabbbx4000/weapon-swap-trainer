@@ -1,98 +1,114 @@
 # Component Trainer
 
-A V Rising weapon swap training application to help improve component execution speed.
+A V Rising weapon swap training application to help improve your component execution speed and build muscle memory.
 
 ## Features
 
 - **Training Mode**: Practice random components with real-time feedback
 - **Personal Bests**: Track your best time for each component
-- **Statistics**: View average, fastest, and slowest times per round
-- **Customizable**: Import/export component lists, configure round size
-- **Auto-Skip**: Optional auto-advance after a time limit
+- **Statistics**: View average, fastest, and slowest times after each round
+- **Customizable Components**: Add, remove, or import/export your own component lists
+- **Auto-Skip Option**: Automatically advance to the next component after a time limit
+- **Progress Tracking**: See your times during the round and track improvements
 
-## Project Structure
+## Getting Started
 
-```
-component-trainer/
-├── index.html              # Main HTML file
-├── css/
-│   └── styles.css         # All styling
-├── js/
-│   ├── config.js          # Configuration constants
-│   ├── storage.js         # localStorage management
-│   ├── component-manager.js   # Component CRUD operations
-│   ├── statistics-manager.js  # Personal bests and statistics
-│   ├── ui-manager.js      # DOM manipulation and rendering
-│   └── app.js             # Main application controller
-└── README.md
-```
+### Quick Start
+1. Download or clone this repository
+2. Open `index.html` in any modern web browser
+3. Click "Start Round" to begin training
+4. Press the displayed key combinations as they appear on screen
 
-## Architecture
+That's it! No installation or build process needed.
 
-### ES6 Modules
-The application is built using ES6 modules for clean separation of concerns:
+## How to Use
 
-- **Config Module**: Application constants and defaults
-- **Storage Manager**: Handles all localStorage operations
-- **Component Manager**: Manages component data and operations
-- **Statistics Manager**: Tracks personal bests and calculates stats
-- **UI Manager**: Handles all DOM manipulation
-- **Main App**: Orchestrates all modules and manages application state
+### Training
+1. Click **"Start Round"** to begin
+2. A 3-second countdown will appear
+3. Press the key sequence shown on screen (e.g., press `1`, then `Q`)
+4. Complete all components in the round
+5. View your results and personal bests
 
-### Design Patterns
-- **Single Responsibility**: Each class has one clear purpose
-- **Separation of Concerns**: UI, business logic, and storage are separated
-- **Module Pattern**: ES6 modules for encapsulation
-- **State Management**: Centralized state in main app controller
+### Configuring Components
 
-## Usage
+Click the **"Configure"** button to customize your training:
 
-1. Open `index.html` in a modern web browser
-2. Click "Start Round" to begin training
-3. Press the required key combinations as they appear
-4. View your statistics and personal bests after each round
+#### Adding Components
+1. Enter the key combination (e.g., `1,e` or `2,LeftMouseButton`)
+2. Enter a description (e.g., "crossbow attack")
+3. Click "Add"
 
-## Configuration
+#### Import/Export
+- **Export**: Save your components as a JSON file
+- **Import**: Load components from a previously saved JSON file
 
-### Adding Components
-1. Click "Configure" button
-2. Enter key combination (e.g., `1,e` or `2,LeftMouseButton`)
-3. Enter description (e.g., "crossbow attack")
-4. Click "Add"
+### Settings
 
-### Import/Export
-- **Export**: Download your components as JSON
-- **Import**: Load components from a JSON file
+- **Components per round**: Choose how many components to practice (1-9999)
+- **Auto-skip**: Enable automatic advancement after a time limit (adjustable from 0.1 to 10 seconds)
 
-### Round Settings
-- **Components per round**: Set how many components to practice (1-9999)
-- **Auto-skip**: Automatically advance after a time limit
+## Key Features Explained
 
-## Key Bindings
+### Personal Bests
+The app automatically tracks your fastest time for each component. When you beat a personal best, you'll see a ★ indicator and "NEW PB!" message.
 
-- **Training**: Press the displayed keys in sequence
-- **Escape**: Close modals
-- **Enter**: Add component (when in input field)
+### Round Statistics
+After each round, view:
+- **Average Time**: Your mean completion time
+- **Fastest**: Your quickest component
+- **Slowest**: Your slowest component
+- **New PBs**: How many personal bests you achieved
+
+### Error Tracking
+If you press the wrong key, the indicators will flash red and reset. Errors are counted but don't stop your progress.
+
+## Keyboard Shortcuts
+
+- **Any Key**: Use during training to execute components
+- **Escape**: Close open modals
+- **Enter**: Add a new component (when typing in the description field)
+
+## Default Components
+
+The app comes pre-loaded with common V Rising weapon components:
+- Greatsword attack (1,Q)
+- Crossbow auto & attack (2,LeftMouseButton & 2,E)
+- Spear attack (3,Q)
+- Whip auto & attack (4,LeftMouseButton & 4,Q)
+- Slashers iframe & invis (5,Q & 5,E)
+- Pistols iframe & auto (6,E & 6,LeftMouseButton)
+- Reaper attack (8,Q)
+- Twinblades attack (7,E)
+
+## Data Storage
+
+All your data is saved locally in your browser:
+- Your component list
+- All personal best times
+- Your preferences (round size, auto-skip settings)
+
+**Note**: Clearing your browser data will reset everything.
 
 ## Browser Compatibility
 
-Requires a modern browser with ES6 module support:
-- Chrome/Edge 61+
-- Firefox 60+
-- Safari 11+
+Works in all modern browsers:
+- Chrome
+- Firefox
+- Safari
+- Edge
 
-## Data Persistence
+## Tips for Best Results
 
-All data is stored in browser localStorage:
-- Component configurations
-- Personal best times
-- User preferences (round size, auto-skip settings)
+1. **Start with smaller rounds** (5-10 components) to build consistency
+2. **Use auto-skip** to maintain rhythm and prevent overthinking
+3. **Focus on accuracy first**, then speed
+4. **Track your progress** by reviewing your personal bests regularly
 
-## Code Standards
+## Support
 
-- ES6+ JavaScript
-- Modular architecture
-- Clear naming conventions
-- JSDoc comments for public methods
-- No dead code
-- Consistent formatting
+If you encounter any issues or have suggestions, please open an issue on GitHub.
+
+---
+
+Happy training!

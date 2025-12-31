@@ -2,9 +2,7 @@
  * Component Manager - Handles component operations
  */
 
-import { StorageManager } from './storage.js';
-
-export class ComponentManager {
+class ComponentManager {
     constructor() {
         this.components = StorageManager.loadComponents();
     }

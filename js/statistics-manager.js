@@ -2,9 +2,7 @@
  * Statistics Manager - Handles personal bests and round statistics
  */
 
-import { StorageManager } from './storage.js';
-
-export class StatisticsManager {
+class StatisticsManager {
     constructor() {
         this.personalBests = StorageManager.loadPersonalBests();
     }

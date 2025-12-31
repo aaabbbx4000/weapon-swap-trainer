@@ -2,13 +2,7 @@
  * Main Application Controller
  */
 
-import { CONFIG, SCREENS } from './config.js';
-import { StorageManager } from './storage.js';
-import { ComponentManager } from './component-manager.js';
-import { StatisticsManager } from './statistics-manager.js';
-import { UIManager } from './ui-manager.js';
-
-export class TrainingApp {
+class TrainingApp {
     constructor() {
         this.componentManager = new ComponentManager();
         this.statisticsManager = new StatisticsManager();

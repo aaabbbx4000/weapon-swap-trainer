@@ -2,9 +2,7 @@
  * Storage Manager - Handles all localStorage operations
  */
 
-import { CONFIG, DEFAULT_COMPONENTS } from './config.js';
-
-export class StorageManager {
+class StorageManager {
     /**
      * Load components from localStorage or return defaults
      */

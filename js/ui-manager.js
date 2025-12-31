@@ -2,9 +2,7 @@
  * UI Manager - Handles all DOM manipulation and rendering
  */
 
-import { SCREENS, KEY_MAPPINGS, CONFIG } from './config.js';
-
-export class UIManager {
+class UIManager {
     constructor() {
         this.elements = this.cacheElements();
     }
