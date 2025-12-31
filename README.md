@@ -71,15 +71,7 @@ If you press the wrong key, the indicators will flash red and reset. Errors are 
 
 ## Default Components
 
-The app comes pre-loaded with common V Rising weapon components:
-- Greatsword attack (1,Q)
-- Crossbow auto & attack (2,LeftMouseButton & 2,E)
-- Spear attack (3,Q)
-- Whip auto & attack (4,LeftMouseButton & 4,Q)
-- Slashers iframe & invis (5,Q & 5,E)
-- Pistols iframe & auto (6,E & 6,LeftMouseButton)
-- Reaper attack (8,Q)
-- Twinblades attack (7,E)
+The app comes pre-loaded with common V Rising weapon components. You can find the complete list in `components.json` and import it anytime through the Configure menu.
 
 ## Data Storage
 
