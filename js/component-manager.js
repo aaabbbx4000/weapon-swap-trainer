@@ -4,7 +4,14 @@
 
 class ComponentManager {
     constructor() {
-        this.components = StorageManager.loadComponents();
+        this.components = [];
+    }
+
+    /**
+     * Initialize by loading components asynchronously
+     */
+    async init() {
+        this.components = await StorageManager.loadComponents();
     }
 
     /**

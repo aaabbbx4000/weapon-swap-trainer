@@ -32,21 +32,6 @@ const CONFIG = {
     }
 };
 
-const DEFAULT_COMPONENTS = [
-    { key: "1,q", description: "greatsword attack" },
-    { key: "2,LeftMouseButton", description: "crossbow auto" },
-    { key: "2,e", description: "crossbow attack" },
-    { key: "3,q", description: "spear attack" },
-    { key: "4,q", description: "whip attack" },
-    { key: "4,LeftMouseButton", description: "whip auto" },
-    { key: "5,q", description: "slashers iframe" },
-    { key: "5,e", description: "slashers invis" },
-    { key: "6,e", description: "pistols iframe" },
-    { key: "6,LeftMouseButton", description: "pistols auto" },
-    { key: "8,q", description: "reaper attack" },
-    { key: "7,e", description: "twinblades attack" }
-];
-
 const SCREENS = {
     WELCOME: 'welcomeScreen',
     COUNTDOWN: 'countdownScreen',

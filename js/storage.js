@@ -4,9 +4,9 @@
 
 class StorageManager {
     /**
-     * Load components from localStorage or return defaults
+     * Load components from localStorage, or fetch from components.json if empty
      */
-    static loadComponents() {
+    static async loadComponents() {
         const saved = localStorage.getItem(CONFIG.STORAGE_KEYS.COMPONENTS);
         if (saved) {
             try {
@@ -18,7 +18,22 @@ class StorageManager {
                 console.error('Error loading components:', error);
             }
         }
-        return [...DEFAULT_COMPONENTS];
+
+        // Try to load from components.json file
+        try {
+            const response = await fetch('components.json');
+            if (response.ok) {
+                const components = await response.json();
+                if (Array.isArray(components) && components.length > 0) {
+                    return components;
+                }
+            }
+        } catch (error) {
+            console.log('No components.json file found, starting with empty list');
+        }
+
+        // Return empty array if no data found
+        return [];
     }
 
     /**

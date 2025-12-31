@@ -26,14 +26,13 @@ class TrainingApp {
             component: null,
             autoAdvance: null
         };
-
-        this.init();
     }
 
     /**
      * Initialize the application
      */
-    init() {
+    async init() {
+        await this.componentManager.init();
         this.ui.setRoundSize(this.state.roundSize);
         this.ui.setAutoAdvanceSettings(this.state.autoAdvance, this.state.autoAdvanceDelay);
         this.setupEventListeners();
@@ -532,6 +531,7 @@ class TrainingApp {
 }
 
 // Initialize app when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-    new TrainingApp();
+document.addEventListener('DOMContentLoaded', async () => {
+    const app = new TrainingApp();
+    await app.init();
 });

@@ -71,7 +71,7 @@ If you press the wrong key, the indicators will flash red and reset. Errors are 
 
 ## Default Components
 
-The app comes pre-loaded with common V Rising weapon components. You can find the complete list in `components.json` and import it anytime through the Configure menu.
+On first run, the app automatically loads components from the included `components.json` file (common V Rising weapon components). If the file is missing, the app starts with an empty component list. You can always import the `components.json` file later through the Configure menu.
 
 ## Data Storage
 
