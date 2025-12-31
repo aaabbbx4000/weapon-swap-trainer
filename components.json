@@ -1,0 +1,58 @@
+[
+  {
+    "key": "1,LeftMouseButton",
+    "description": "crossbow auto"
+  },
+  {
+    "key": "1,e",
+    "description": "crossbow attack"
+  },
+  {
+    "key": "2,q",
+    "description": "reaper close spin attack"
+  },
+  {
+    "key": "3,q",
+    "description": "spear attack"
+  },
+  {
+    "key": "4,q",
+    "description": "axe quick attack"
+  },
+  {
+    "key": "4,e",
+    "description": "axe stun attack"
+  },
+  {
+    "key": "5,q",
+    "description": "slashers iframe"
+  },
+  {
+    "key": "5,e",
+    "description": "slashers invis"
+  },
+  {
+    "key": "6,e",
+    "description": "pistols iframe"
+  },
+  {
+    "key": "6,LeftMouseButton",
+    "description": "pistols auto"
+  },
+  {
+    "key": "7,q",
+    "description": "mace attack"
+  },
+  {
+    "key": "7,e",
+    "description": "mace knock back"
+  },
+  {
+    "key": "8,q",
+    "description": "sword spin attack"
+  },
+  {
+    "key": "8,e",
+    "description": "sword distance attack"
+  }
+]
