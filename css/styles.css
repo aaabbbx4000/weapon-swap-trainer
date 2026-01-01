@@ -147,8 +147,8 @@ h1 {
     flex-direction: column;
     gap: 20px;
     align-items: center;
-    width: 100%;
     max-width: 400px;
+    margin: 0 auto;
 }
 
 .start-button-large {
