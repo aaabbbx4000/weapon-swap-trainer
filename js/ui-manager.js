@@ -33,7 +33,7 @@ class UIManager {
             countdownNumber: document.getElementById('countdownNumber'),
             weaponName: document.getElementById('weaponName'),
             weaponImage: document.getElementById('weaponImage'),
-            keyIndicators: document.getElementById('keyIndicators'),
+            skillKeyOverlay: document.getElementById('skillKeyOverlay'),
             timer: document.getElementById('timer'),
             pbDisplay: document.getElementById('pbDisplay'),
             roundProgress: document.getElementById('roundProgress'),
@@ -86,10 +86,11 @@ class UIManager {
         this.elements.weaponImage.src = weaponImagePath;
         this.elements.weaponImage.className = 'weapon-image';
 
-        this.elements.roundProgress.textContent = `Skill ${currentIndex + 1} / ${totalCount}`;
+        // Update skill key overlay (just Q or E)
+        this.elements.skillKeyOverlay.textContent = component.skill;
+        this.elements.skillKeyOverlay.className = 'skill-key-overlay';
 
-        const requiredKeys = this.parseKeys(component.key);
-        this.renderKeyIndicators(requiredKeys);
+        this.elements.roundProgress.textContent = `Skill ${currentIndex + 1} / ${totalCount}`;
     }
 
     /**
@@ -100,75 +101,32 @@ class UIManager {
     }
 
     /**
-     * Render key indicators for weapon skill (slot number + skill letter)
-     */
-    renderKeyIndicators(requiredKeys) {
-        this.elements.keyIndicators.innerHTML = requiredKeys.map(key => {
-            const displayKey = this.getDisplayKey(key);
-            const elementId = this.getKeyElementId(key);
-
-            return `<span id="${elementId}" class="key-indicator skill-key">${displayKey}</span>`;
-        }).join('');
-    }
-
-    /**
-     * Get display text for a key
-     */
-    getDisplayKey(key) {
-        return (KEY_MAPPINGS[key] || key.toUpperCase());
-    }
-
-    /**
-     * Get element ID for a key
-     */
-    getKeyElementId(key) {
-        return `key-${key.replace(' ', 'space')}`;
-    }
-
-    /**
-     * Update key indicators based on progress (slot and skill)
+     * Update visual feedback based on progress
      */
     updateKeyIndicators(requiredKeys, currentKeyIndex) {
-        requiredKeys.forEach((key, index) => {
-            const elementId = this.getKeyElementId(key);
-            const element = document.getElementById(elementId);
-
-            if (!element) return;
-
-            if (index < currentKeyIndex) {
-                element.className = 'key-indicator skill-key key-completed';
-            } else {
-                element.className = 'key-indicator skill-key';
-            }
-        });
-
-        // Update weapon image border based on progress
+        // Update weapon image and skill overlay based on progress
         if (currentKeyIndex === 0) {
             // No keys pressed yet
             this.elements.weaponImage.className = 'weapon-image';
+            this.elements.skillKeyOverlay.className = 'skill-key-overlay';
         } else if (currentKeyIndex === 1) {
-            // Slot number pressed correctly
-            this.elements.weaponImage.className = 'weapon-image weapon-slot-correct';
+            // Slot number pressed correctly (first key)
+            this.elements.weaponImage.className = 'weapon-image';
+            this.elements.skillKeyOverlay.className = 'skill-key-overlay';
         } else if (currentKeyIndex >= requiredKeys.length) {
-            // All keys pressed correctly
+            // All keys pressed correctly (skill complete)
             this.elements.weaponImage.className = 'weapon-image weapon-complete';
+            this.elements.skillKeyOverlay.className = 'skill-key-overlay skill-complete';
         }
     }
 
     /**
-     * Flash error on weapon image and key indicators
+     * Flash error on weapon image and skill overlay
      */
     flashKeyError(requiredKeys, callback) {
-        // Show error on weapon image
+        // Show error on weapon image and skill overlay
         this.elements.weaponImage.className = 'weapon-image weapon-error';
-
-        // Show error on key indicators
-        requiredKeys.forEach(key => {
-            const element = document.getElementById(this.getKeyElementId(key));
-            if (element) {
-                element.className = 'key-indicator skill-key key-error';
-            }
-        });
+        this.elements.skillKeyOverlay.className = 'skill-key-overlay skill-error';
 
         setTimeout(() => {
             callback();

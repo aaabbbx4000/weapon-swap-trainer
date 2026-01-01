@@ -91,20 +91,21 @@ h1 {
     margin-bottom: -5px;
 }
 
-.weapon-image {
+.weapon-image-container {
+    position: relative;
     width: 250px;
     height: 250px;
+}
+
+.weapon-image {
+    width: 100%;
+    height: 100%;
     object-fit: contain;
     border: 3px solid rgba(255, 255, 255, 0.2);
     border-radius: 12px;
     background: rgba(0, 0, 0, 0.3);
     padding: 15px;
     transition: all 0.2s;
-}
-
-.weapon-image.weapon-slot-correct {
-    border-color: #00ff88;
-    box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
 }
 
 .weapon-image.weapon-complete {
@@ -117,41 +118,38 @@ h1 {
     box-shadow: 0 0 15px rgba(255, 68, 68, 0.5);
 }
 
-/* Key Indicators */
-.key-indicator {
-    display: inline-block;
-    padding: 10px 20px;
-    margin: 5px;
-    border: 2px solid #666;
-    border-radius: 5px;
-    background: rgba(255, 255, 255, 0.05);
-    font-family: 'Courier New', monospace;
-    font-size: 1.5em;
-    transition: all 0.1s;
-}
-
-.skill-key {
-    padding: 12px 25px;
-    font-size: 2.5em;
-    font-weight: bold;
+.skill-key-overlay {
+    position: absolute;
+    top: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(26, 26, 46, 0.9);
     border: 3px solid #666;
     border-radius: 8px;
+    padding: 8px 20px;
+    font-size: 2em;
+    font-weight: bold;
+    color: #e4e4e4;
+    font-family: 'Courier New', monospace;
+    transition: all 0.2s;
+    pointer-events: none;
+    z-index: 10;
 }
 
-.key-indicator.key-completed {
+.skill-key-overlay.skill-complete {
     background: #00ff88;
     color: #000;
     border-color: #00ff88;
-    transform: scale(1.1);
-    box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.8);
 }
 
-.key-indicator.key-error {
+.skill-key-overlay.skill-error {
     background: #ff4444;
     color: #fff;
     border-color: #ff4444;
-    box-shadow: 0 0 20px rgba(255, 68, 68, 0.5);
+    box-shadow: 0 0 20px rgba(255, 68, 68, 0.8);
 }
+
 
 /* Timer */
 .timer {
