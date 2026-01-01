@@ -54,10 +54,8 @@
                 </div>
                 <div class="weapon-display">
                     <div id="weaponName" class="weapon-name">Weapon</div>
-                    <div class="weapon-image-container">
-                        <img id="weaponImage" class="weapon-image" src="" alt="Weapon">
-                        <div id="skillKeyOverlay" class="skill-key-overlay">Q</div>
-                    </div>
+                    <div id="keyIndicators"></div>
+                    <img id="weaponImage" class="weapon-image" src="" alt="Weapon">
                 </div>
                 <div class="timer" id="timer">0.0s</div>
                 <div class="pb-display" id="pbDisplay"></div>
@@ -118,9 +116,15 @@
                 <div id="weaponSlotsList"></div>
             </div>
 
-            <!-- Auto-Skip Settings -->
-            <div class="auto-skip-settings">
-                <h3>Auto-Skip Settings</h3>
+            <!-- Options -->
+            <div class="config-section">
+                <h3>Options</h3>
+                <div class="auto-skip-checkbox">
+                    <input type="checkbox" id="includeSkillsCheckbox" checked>
+                    <label for="includeSkillsCheckbox">
+                        Include Q/E skills (uncheck to train weapon swaps only)
+                    </label>
+                </div>
                 <div class="auto-skip-checkbox">
                     <input type="checkbox" id="autoAdvanceCheckbox">
                     <label for="autoAdvanceCheckbox">

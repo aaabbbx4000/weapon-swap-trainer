@@ -41,25 +41,37 @@ class ComponentManager {
     /**
      * Get all possible weapon skills from current configuration
      */
-    getAllComponents() {
-        const skills = [];
+    getAllComponents(includeSkills = true) {
+        const components = [];
 
         for (let slot = 1; slot <= 8; slot++) {
             const weapon = this.weaponSlots[slot];
             if (weapon) {
-                for (const skill of this.skills) {
-                    skills.push({
-                        key: `${slot},${skill}`,
-                        description: `${weapon} ${skill}`,
+                if (includeSkills) {
+                    // Include Q and E skills
+                    for (const skill of this.skills) {
+                        components.push({
+                            key: `${slot},${skill}`,
+                            description: `${weapon} ${skill}`,
+                            slot: slot,
+                            weapon: weapon,
+                            skill: skill
+                        });
+                    }
+                } else {
+                    // Weapon swap only (no Q/E)
+                    components.push({
+                        key: `${slot}`,
+                        description: `${weapon}`,
                         slot: slot,
                         weapon: weapon,
-                        skill: skill
+                        skill: null
                     });
                 }
             }
         }
 
-        return skills;
+        return components;
     }
 
     /**
@@ -71,25 +83,25 @@ class ComponentManager {
     }
 
     /**
-     * Generate random round of weapon skills
+     * Generate random round of weapon skills or swaps
      */
-    generateRound(size) {
-        const skills = this.getAllComponents();
+    generateRound(size, includeSkills = true) {
+        const components = this.getAllComponents(includeSkills);
 
-        if (skills.length === 0) {
+        if (components.length === 0) {
             throw new Error('No weapons configured in slots. Please configure weapons in slots 1-8.');
         }
 
         const round = [];
-        const availableSkills = [...skills];
+        const availableComponents = [...components];
 
         for (let i = 0; i < size; i++) {
-            const randomIndex = Math.floor(Math.random() * availableSkills.length);
-            round.push(availableSkills[randomIndex]);
-            availableSkills.splice(randomIndex, 1);
+            const randomIndex = Math.floor(Math.random() * availableComponents.length);
+            round.push(availableComponents[randomIndex]);
+            availableComponents.splice(randomIndex, 1);
 
-            if (availableSkills.length === 0) {
-                availableSkills.push(...skills);
+            if (availableComponents.length === 0) {
+                availableComponents.push(...components);
             }
         }
 

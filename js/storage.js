@@ -77,4 +77,19 @@ class StorageManager {
     static saveWeaponSlots(weaponSlots) {
         localStorage.setItem(CONFIG.STORAGE_KEYS.WEAPON_SLOTS, JSON.stringify(weaponSlots));
     }
+
+    /**
+     * Load include skills setting from localStorage
+     */
+    static loadIncludeSkills() {
+        const saved = localStorage.getItem(CONFIG.STORAGE_KEYS.INCLUDE_SKILLS);
+        return saved !== null ? saved === 'true' : CONFIG.TRAINING_MODE.DEFAULT_INCLUDE_SKILLS;
+    }
+
+    /**
+     * Save include skills setting to localStorage
+     */
+    static saveIncludeSkills(includeSkills) {
+        localStorage.setItem(CONFIG.STORAGE_KEYS.INCLUDE_SKILLS, includeSkills.toString());
+    }
 }

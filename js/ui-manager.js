@@ -33,7 +33,7 @@ class UIManager {
             countdownNumber: document.getElementById('countdownNumber'),
             weaponName: document.getElementById('weaponName'),
             weaponImage: document.getElementById('weaponImage'),
-            skillKeyOverlay: document.getElementById('skillKeyOverlay'),
+            keyIndicators: document.getElementById('keyIndicators'),
             timer: document.getElementById('timer'),
             pbDisplay: document.getElementById('pbDisplay'),
             roundProgress: document.getElementById('roundProgress'),
@@ -52,6 +52,7 @@ class UIManager {
             roundSizeInput: document.getElementById('roundSizeInput'),
             autoAdvanceCheckbox: document.getElementById('autoAdvanceCheckbox'),
             autoAdvanceDelayInput: document.getElementById('autoAdvanceDelayInput'),
+            includeSkillsCheckbox: document.getElementById('includeSkillsCheckbox'),
             weaponSlotsList: document.getElementById('weaponSlotsList'),
             pbListContent: document.getElementById('pbListContent')
         };
@@ -78,20 +79,24 @@ class UIManager {
      * Update weapon display
      */
     updateComponent(component, currentIndex, totalCount) {
-        // Update weapon name with skill letter
-        this.elements.weaponName.textContent = `${component.weapon} ${component.skill}`;
+        // Update weapon name
+        this.elements.weaponName.textContent = component.weapon;
 
-        // Update weapon image
-        const weaponImagePath = WEAPON_IMAGES[component.weapon];
+        // Update weapon image - use skill image if skill present, otherwise weapon image
+        let weaponImagePath;
+        if (component.skill) {
+            const skillKey = `${component.weapon}-${component.skill.toLowerCase()}`;
+            weaponImagePath = WEAPON_SKILL_IMAGES[skillKey] || WEAPON_IMAGES[component.weapon];
+        } else {
+            weaponImagePath = WEAPON_IMAGES[component.weapon];
+        }
         this.elements.weaponImage.src = weaponImagePath;
         this.elements.weaponImage.className = 'weapon-image';
 
-        // Update skill key overlay (just Q or E) with position class
-        this.elements.skillKeyOverlay.textContent = component.skill;
-        const skillClass = component.skill.toLowerCase() === 'q' ? 'skill-q' : 'skill-e';
-        this.elements.skillKeyOverlay.className = `skill-key-overlay ${skillClass}`;
-
         this.elements.roundProgress.textContent = `Skill ${currentIndex + 1} / ${totalCount}`;
+
+        const requiredKeys = this.parseKeys(component.key);
+        this.renderKeyIndicators(requiredKeys);
     }
 
     /**
@@ -102,48 +107,60 @@ class UIManager {
     }
 
     /**
-     * Update visual feedback based on progress
+     * Render key indicators for weapon skill (slot number + skill letter)
      */
-    updateKeyIndicators(requiredKeys, currentKeyIndex) {
-        // Determine skill position class (Q = left, E = right)
-        const skillKey = requiredKeys[requiredKeys.length - 1]; // Last key is the skill (Q or E)
-        const skillClass = skillKey.toLowerCase() === 'q' ? 'skill-q' : 'skill-e';
+    renderKeyIndicators(requiredKeys) {
+        this.elements.keyIndicators.innerHTML = requiredKeys.map(key => {
+            const displayKey = this.getDisplayKey(key);
+            const elementId = this.getKeyElementId(key);
 
-        // Update weapon image and skill overlay based on progress
-        if (currentKeyIndex === 0) {
-            // No keys pressed yet
-            this.elements.weaponImage.className = 'weapon-image';
-            this.elements.skillKeyOverlay.className = `skill-key-overlay ${skillClass}`;
-        } else if (currentKeyIndex === 1) {
-            // Slot number pressed correctly (weapon selected) - show green border on image
-            this.elements.weaponImage.className = 'weapon-image weapon-complete';
-            this.elements.skillKeyOverlay.className = `skill-key-overlay ${skillClass}`;
-        } else if (currentKeyIndex >= requiredKeys.length) {
-            // All keys pressed correctly (skill complete) - show green on both image and overlay
-            this.elements.weaponImage.className = 'weapon-image weapon-complete';
-            this.elements.skillKeyOverlay.className = `skill-key-overlay ${skillClass} skill-complete`;
-        }
+            return `<span id="${elementId}" class="key-indicator skill-key">${displayKey}</span>`;
+        }).join('');
     }
 
     /**
-     * Flash error on weapon image and optionally skill overlay
+     * Get display text for a key
      */
-    flashKeyError(requiredKeys, callback, currentKeyIndex) {
-        // Determine skill position class (Q = left, E = right)
-        const skillKey = requiredKeys[requiredKeys.length - 1]; // Last key is the skill (Q or E)
-        const skillClass = skillKey.toLowerCase() === 'q' ? 'skill-q' : 'skill-e';
+    getDisplayKey(key) {
+        return (KEY_MAPPINGS[key] || key.toUpperCase());
+    }
 
-        // Show error on weapon image
-        this.elements.weaponImage.className = 'weapon-image weapon-error';
+    /**
+     * Get element ID for a key
+     */
+    getKeyElementId(key) {
+        return `key-${key.replace(' ', 'space')}`;
+    }
 
-        // Only show red on Q/E overlay if they pressed the wrong skill key (second key)
-        if (currentKeyIndex === 1) {
-            // Wrong skill key (Q or E) - show red on overlay too
-            this.elements.skillKeyOverlay.className = `skill-key-overlay ${skillClass} skill-error`;
-        } else {
-            // Wrong weapon slot (first key) - keep Q/E overlay normal
-            this.elements.skillKeyOverlay.className = `skill-key-overlay ${skillClass}`;
-        }
+    /**
+     * Update key indicators based on progress (slot and skill)
+     */
+    updateKeyIndicators(requiredKeys, currentKeyIndex) {
+        requiredKeys.forEach((key, index) => {
+            const elementId = this.getKeyElementId(key);
+            const element = document.getElementById(elementId);
+
+            if (!element) return;
+
+            if (index < currentKeyIndex) {
+                element.className = 'key-indicator skill-key key-completed';
+            } else {
+                element.className = 'key-indicator skill-key';
+            }
+        });
+    }
+
+    /**
+     * Flash error on key indicators
+     */
+    flashKeyError(requiredKeys, callback) {
+        // Show error on key indicators
+        requiredKeys.forEach(key => {
+            const element = document.getElementById(this.getKeyElementId(key));
+            if (element) {
+                element.className = 'key-indicator skill-key key-error';
+            }
+        });
 
         setTimeout(() => {
             callback();
@@ -358,5 +375,12 @@ class UIManager {
     setAutoAdvanceSettings(enabled, delay) {
         this.elements.autoAdvanceCheckbox.checked = enabled;
         this.elements.autoAdvanceDelayInput.value = delay;
+    }
+
+    /**
+     * Set include skills checkbox
+     */
+    setIncludeSkills(includeSkills) {
+        this.elements.includeSkillsCheckbox.checked = includeSkills;
     }
 }
