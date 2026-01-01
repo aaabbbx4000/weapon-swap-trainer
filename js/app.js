@@ -12,7 +12,6 @@ class TrainingApp {
             roundSize: StorageManager.loadRoundSize(),
             autoAdvance: StorageManager.loadAutoAdvance(),
             autoAdvanceDelay: StorageManager.loadAutoAdvanceDelay(),
-            includeSkills: StorageManager.loadIncludeSkills(),
             currentRound: [],
             currentComponentIndex: 0,
             currentKeyIndex: 0,
@@ -36,7 +35,6 @@ class TrainingApp {
         await this.componentManager.init();
         this.ui.setRoundSize(this.state.roundSize);
         this.ui.setAutoAdvanceSettings(this.state.autoAdvance, this.state.autoAdvanceDelay);
-        this.ui.setIncludeSkills(this.state.includeSkills);
         this.setupEventListeners();
     }
 
@@ -75,11 +73,6 @@ class TrainingApp {
         this.ui.elements.autoAdvanceDelayInput.addEventListener('input', (e) => this.handleAutoDelayInput(e));
         this.ui.elements.autoAdvanceDelayInput.addEventListener('blur', (e) => this.handleAutoDelayBlur(e));
 
-        this.ui.elements.includeSkillsCheckbox.addEventListener('change', (e) => {
-            this.state.includeSkills = e.target.checked;
-            StorageManager.saveIncludeSkills(this.state.includeSkills);
-        });
-
         // Keyboard events
         document.addEventListener('keydown', (e) => this.handleKeyDown(e));
         document.addEventListener('mousedown', (e) => this.handleMouseDown(e));
@@ -99,7 +92,7 @@ class TrainingApp {
 
             StorageManager.saveRoundSize(this.state.roundSize);
 
-            this.state.currentRound = this.componentManager.generateRound(this.state.roundSize, this.state.includeSkills);
+            this.state.currentRound = this.componentManager.generateRound(this.state.roundSize);
             this.state.currentComponentIndex = 0;
             this.state.roundResults = [];
 

@@ -28,12 +28,7 @@ const CONFIG = {
         ROUND_SIZE: 'roundSize',
         AUTO_ADVANCE: 'autoAdvance',
         AUTO_ADVANCE_DELAY: 'autoAdvanceDelay',
-        WEAPON_SLOTS: 'weaponSlots',
-        INCLUDE_SKILLS: 'includeSkills'
-    },
-
-    TRAINING_MODE: {
-        DEFAULT_INCLUDE_SKILLS: true
+        WEAPON_SLOTS: 'weaponSlots'
     }
 };
 
@@ -65,23 +60,6 @@ const WEAPONS = [
     'Pistols',
     'Reaper'
 ];
-
-const WEAPON_IMAGES = {
-    'Spear': 'images/Weapon_SanguineSpear.webp',
-    'Slasher': 'images/Weapon_SanguineSlashers.webp',
-    'Axe': 'images/Weapon_SanguineAxes.webp',
-    'Mace': 'images/Weapon_SanguineMace.webp',
-    'Sword': 'images/Weapon_SanguineSword.webp',
-    'Crossbow': 'images/Weapon_SanguineCrossbow.webp',
-    'Greatsword': 'images/Weapon_SanguineGreatsword.webp',
-    'Whip': 'images/Weapon_SanguineWhip.webp',
-    'LongBow': 'images/Weapon_SanguineLongbow.webp',
-    'Dagger': 'images/Weapon_SanguineDaggers.webp',
-    'Claw': 'images/Weapon_SanguineClaws.webp',
-    'TwinBlade': 'images/Weapon_SanguineTwinblade.webp',
-    'Pistols': 'images/Weapon_SanguinePistols.webp',
-    'Reaper': 'images/Weapon_SanguineReaper.webp'
-};
 
 // Weapon skill images mapping (weapon + skill -> image path)
 const WEAPON_SKILL_IMAGES = {

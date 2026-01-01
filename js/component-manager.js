@@ -41,31 +41,19 @@ class ComponentManager {
     /**
      * Get all possible weapon skills from current configuration
      */
-    getAllComponents(includeSkills = true) {
+    getAllComponents() {
         const components = [];
 
         for (let slot = 1; slot <= 8; slot++) {
             const weapon = this.weaponSlots[slot];
             if (weapon) {
-                if (includeSkills) {
-                    // Include Q and E skills
-                    for (const skill of this.skills) {
-                        components.push({
-                            key: `${slot},${skill}`,
-                            description: `${weapon} ${skill}`,
-                            slot: slot,
-                            weapon: weapon,
-                            skill: skill
-                        });
-                    }
-                } else {
-                    // Weapon swap only (no Q/E)
+                for (const skill of this.skills) {
                     components.push({
-                        key: `${slot}`,
-                        description: `${weapon}`,
+                        key: `${slot},${skill}`,
+                        description: `${weapon} ${skill}`,
                         slot: slot,
                         weapon: weapon,
-                        skill: null
+                        skill: skill
                     });
                 }
             }
@@ -83,10 +71,10 @@ class ComponentManager {
     }
 
     /**
-     * Generate random round of weapon skills or swaps
+     * Generate random round of weapon skills
      */
-    generateRound(size, includeSkills = true) {
-        const components = this.getAllComponents(includeSkills);
+    generateRound(size) {
+        const components = this.getAllComponents();
 
         if (components.length === 0) {
             throw new Error('No weapons configured in slots. Please configure weapons in slots 1-8.');

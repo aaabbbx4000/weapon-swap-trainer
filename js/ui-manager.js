@@ -52,7 +52,6 @@ class UIManager {
             roundSizeInput: document.getElementById('roundSizeInput'),
             autoAdvanceCheckbox: document.getElementById('autoAdvanceCheckbox'),
             autoAdvanceDelayInput: document.getElementById('autoAdvanceDelayInput'),
-            includeSkillsCheckbox: document.getElementById('includeSkillsCheckbox'),
             weaponSlotsList: document.getElementById('weaponSlotsList'),
             pbListContent: document.getElementById('pbListContent')
         };
@@ -82,14 +81,9 @@ class UIManager {
         // Update weapon name
         this.elements.weaponName.textContent = component.weapon;
 
-        // Update weapon image - use skill image if skill present, otherwise weapon image
-        let weaponImagePath;
-        if (component.skill) {
-            const skillKey = `${component.weapon}-${component.skill.toLowerCase()}`;
-            weaponImagePath = WEAPON_SKILL_IMAGES[skillKey] || WEAPON_IMAGES[component.weapon];
-        } else {
-            weaponImagePath = WEAPON_IMAGES[component.weapon];
-        }
+        // Update weapon skill image
+        const skillKey = `${component.weapon}-${component.skill.toLowerCase()}`;
+        const weaponImagePath = WEAPON_SKILL_IMAGES[skillKey];
         this.elements.weaponImage.src = weaponImagePath;
         this.elements.weaponImage.className = 'weapon-image';
 
@@ -406,12 +400,5 @@ class UIManager {
     setAutoAdvanceSettings(enabled, delay) {
         this.elements.autoAdvanceCheckbox.checked = enabled;
         this.elements.autoAdvanceDelayInput.value = delay;
-    }
-
-    /**
-     * Set include skills checkbox
-     */
-    setIncludeSkills(includeSkills) {
-        this.elements.includeSkillsCheckbox.checked = includeSkills;
     }
 }
