@@ -34,6 +34,7 @@ class UIManager {
             countdownNumber: document.getElementById('countdownNumber'),
             weaponName: document.getElementById('weaponName'),
             weaponImage: document.getElementById('weaponImage'),
+            fakeOverlay: document.getElementById('fakeOverlay'),
             keyIndicators: document.getElementById('keyIndicators'),
             timer: document.getElementById('timer'),
             pbDisplay: document.getElementById('pbDisplay'),
@@ -54,7 +55,9 @@ class UIManager {
             autoAdvanceCheckbox: document.getElementById('autoAdvanceCheckbox'),
             autoAdvanceDelayInput: document.getElementById('autoAdvanceDelayInput'),
             weaponSlotsList: document.getElementById('weaponSlotsList'),
-            pbListContent: document.getElementById('pbListContent')
+            pbListContent: document.getElementById('pbListContent'),
+            fakeAttacksCheckbox: document.getElementById('fakeAttacksCheckbox'),
+            cancelKeyInput: document.getElementById('cancelKeyInput')
         };
     }
 
@@ -78,9 +81,15 @@ class UIManager {
     /**
      * Update weapon display
      */
-    updateComponent(component, currentIndex, totalCount) {
-        // Update weapon name
-        this.elements.weaponName.textContent = component.weapon;
+    updateComponent(component, currentIndex, totalCount, cancelKey = null) {
+        // Update weapon name - add "Fake Attack" in yellow if it's a fake
+        if (component.isFake) {
+            this.elements.weaponName.innerHTML = `${component.weapon} <span style="color: #ffd700;">Fake Attack</span>`;
+            this.elements.fakeOverlay.style.display = 'block';
+        } else {
+            this.elements.weaponName.textContent = component.weapon;
+            this.elements.fakeOverlay.style.display = 'none';
+        }
 
         // Update weapon skill image
         const skillKey = `${component.weapon}-${component.skill.toLowerCase()}`;
@@ -91,7 +100,7 @@ class UIManager {
         this.elements.roundProgress.textContent = `Skill ${currentIndex + 1} / ${totalCount}`;
 
         const requiredKeys = this.parseKeys(component.key);
-        this.renderKeyIndicators(requiredKeys);
+        this.renderKeyIndicators(requiredKeys, component.isFake, cancelKey);
     }
 
     /**
@@ -102,15 +111,18 @@ class UIManager {
     }
 
     /**
-     * Render key indicators for weapon skill (slot number + skill letter)
+     * Render key indicators for weapon skill (slot number + skill letter + optional cancel key)
      */
-    renderKeyIndicators(requiredKeys) {
-        this.elements.keyIndicators.innerHTML = requiredKeys.map(key => {
+    renderKeyIndicators(requiredKeys, isFake, cancelKey = null) {
+        // requiredKeys already includes the cancel key for fake attacks, so just render them all
+        const keysHTML = requiredKeys.map(key => {
             const displayKey = this.getDisplayKey(key);
             const elementId = this.getKeyElementId(key);
 
             return `<span id="${elementId}" class="key-indicator skill-key">${displayKey}</span>`;
         }).join('');
+
+        this.elements.keyIndicators.innerHTML = keysHTML;
     }
 
     /**
@@ -401,5 +413,13 @@ class UIManager {
     setAutoAdvanceSettings(enabled, delay) {
         this.elements.autoAdvanceCheckbox.checked = enabled;
         this.elements.autoAdvanceDelayInput.value = delay;
+    }
+
+    /**
+     * Set fake attacks settings
+     */
+    setFakeAttacksSettings(enabled, cancelKey) {
+        this.elements.fakeAttacksCheckbox.checked = enabled;
+        this.elements.cancelKeyInput.value = cancelKey;
     }
 }

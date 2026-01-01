@@ -69,7 +69,10 @@
                 <div class="weapon-display">
                     <div id="weaponName" class="weapon-name">Weapon</div>
                     <div id="keyIndicators"></div>
-                    <img id="weaponImage" class="weapon-image" src="" alt="Weapon">
+                    <div style="position: relative; display: inline-block;">
+                        <img id="weaponImage" class="weapon-image" src="" alt="Weapon">
+                        <div id="fakeOverlay" style="display: none; position: absolute; top: 15%; left: 50%; transform: translateX(-50%); color: red; font-size: 48px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8); pointer-events: none; z-index: 10;">FAKE</div>
+                    </div>
                 </div>
                 <div class="training-footer">
                     <div class="timer" id="timer">0.0s</div>
@@ -136,9 +139,11 @@
                 <div id="weaponSlotsList"></div>
             </div>
 
-            <!-- Auto-Skip Settings -->
+            <!-- Options -->
             <div class="auto-skip-settings">
-                <h3>Auto-Skip Settings</h3>
+                <h3>Options</h3>
+
+                <!-- Auto-Skip -->
                 <div class="auto-skip-checkbox">
                     <input type="checkbox" id="autoAdvanceCheckbox">
                     <label for="autoAdvanceCheckbox">
@@ -149,6 +154,22 @@
                     <label for="autoAdvanceDelayInput">Time limit (seconds):</label>
                     <input type="number" id="autoAdvanceDelayInput"
                            min="0.1" max="10" step="0.1" value="3.0">
+                </div>
+
+                <!-- Weapon Fake Attacks -->
+                <div class="fake-attacks-section" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #444;">
+                    <div class="auto-skip-checkbox">
+                        <input type="checkbox" id="fakeAttacksCheckbox">
+                        <label for="fakeAttacksCheckbox">
+                            Enable weapon fake attacks (Greatsword Q, Sword E, Axe E)
+                        </label>
+                    </div>
+                    <div class="fake-attacks-config" style="margin-left: 25px; margin-top: 10px;">
+                        <div class="fake-attack-setting" style="margin-bottom: 10px;">
+                            <label for="cancelKeyInput">Cancellation key:</label>
+                            <input type="text" id="cancelKeyInput" maxlength="1" style="width: 60px; text-align: center;" value="x">
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

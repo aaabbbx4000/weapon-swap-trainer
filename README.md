@@ -22,6 +22,7 @@ Easily configure your weapon loadout for slots 1-8.
 - **Weapon Selection**: Configure which weapons are in slots 1-8
 - **Auto-Skip Option**: Automatically advance to the next skill after a time limit
 - **Progress Tracking**: See your times during the round and track improvements
+- **Weapon Fake Attacks**: Practice cancellation mechanics for advanced PvP techniques
 
 ## Getting Started
 
@@ -58,6 +59,30 @@ Click the **"Configure"** button to set up your weapon slots:
 
 - **Skills per round**: Choose how many weapon skills to practice (1-9999)
 - **Auto-skip**: Enable automatic advancement after a time limit (adjustable from 0.1 to 10 seconds)
+
+### Weapon Fake Attacks
+
+Enable **Weapon Fake Attacks** in the Options section to practice advanced cancellation mechanics:
+
+#### What are Fake Attacks?
+Fake attacks simulate cancelling weapon abilities mid-cast to bait enemy reactions. In training, you'll practice the weapon skill followed by a cancellation key press.
+
+#### Supported Fake Attacks
+- **Greatsword Q** (Slot + Q + Cancel Key)
+- **Sword E** (Slot + E + Cancel Key)
+- **Axe E** (Slot + E + Cancel Key)
+
+#### Configuration
+1. Enable the **"Enable weapon fake attacks"** checkbox
+2. Set your **Cancellation Key** (default: `x`)
+   - This is the key you'll press after the weapon skill to simulate the cancel
+
+#### During Training
+- Fake attacks appear with **"Fake Attack"** in yellow text
+- A red **"FAKE"** overlay appears on the skill image
+- You'll see three keys to press: **Slot Number → Skill Key → Cancellation Key**
+- Example: For Greatsword fake - press `8`, then `Q`, then `X`
+- Personal bests are tracked separately for normal attacks vs fake attacks
 
 ## Key Features Explained
 

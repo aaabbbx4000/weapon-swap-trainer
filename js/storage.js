@@ -77,4 +77,34 @@ class StorageManager {
     static saveWeaponSlots(weaponSlots) {
         localStorage.setItem(CONFIG.STORAGE_KEYS.WEAPON_SLOTS, JSON.stringify(weaponSlots));
     }
+
+    /**
+     * Load fake attacks enabled setting from localStorage
+     */
+    static loadFakeAttacksEnabled() {
+        const saved = localStorage.getItem(CONFIG.STORAGE_KEYS.FAKE_ATTACKS_ENABLED);
+        return saved === 'true';
+    }
+
+    /**
+     * Save fake attacks enabled setting to localStorage
+     */
+    static saveFakeAttacksEnabled(enabled) {
+        localStorage.setItem(CONFIG.STORAGE_KEYS.FAKE_ATTACKS_ENABLED, enabled.toString());
+    }
+
+    /**
+     * Load fake attacks cancellation key from localStorage
+     */
+    static loadFakeAttacksCancelKey() {
+        const saved = localStorage.getItem(CONFIG.STORAGE_KEYS.FAKE_ATTACKS_CANCEL_KEY);
+        return saved || CONFIG.FAKE_ATTACKS.DEFAULT_CANCEL_KEY;
+    }
+
+    /**
+     * Save fake attacks cancellation key to localStorage
+     */
+    static saveFakeAttacksCancelKey(key) {
+        localStorage.setItem(CONFIG.STORAGE_KEYS.FAKE_ATTACKS_CANCEL_KEY, key);
+    }
 }

@@ -23,12 +23,19 @@ const CONFIG = {
         MAX_DELAY: 10
     },
 
+    FAKE_ATTACKS: {
+        DEFAULT_ENABLED: false,
+        DEFAULT_CANCEL_KEY: 'x'
+    },
+
     STORAGE_KEYS: {
         PERSONAL_BESTS: 'componentPBs',
         ROUND_SIZE: 'roundSize',
         AUTO_ADVANCE: 'autoAdvance',
         AUTO_ADVANCE_DELAY: 'autoAdvanceDelay',
-        WEAPON_SLOTS: 'weaponSlots'
+        WEAPON_SLOTS: 'weaponSlots',
+        FAKE_ATTACKS_ENABLED: 'fakeAttacksEnabled',
+        FAKE_ATTACKS_CANCEL_KEY: 'fakeAttacksCancelKey'
     }
 };
 
@@ -103,3 +110,10 @@ const DEFAULT_WEAPON_SLOTS = {
     7: 'Sword',
     8: 'Greatsword'
 };
+
+// Weapon skills that support fake attacks (weapon-skill pairs)
+const FAKE_ATTACK_SKILLS = [
+    { weapon: 'Greatsword', skill: 'Q' },
+    { weapon: 'Sword', skill: 'E' },
+    { weapon: 'Axe', skill: 'E' }
+];

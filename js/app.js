@@ -12,6 +12,8 @@ class TrainingApp {
             roundSize: StorageManager.loadRoundSize(),
             autoAdvance: StorageManager.loadAutoAdvance(),
             autoAdvanceDelay: StorageManager.loadAutoAdvanceDelay(),
+            fakeAttacksEnabled: StorageManager.loadFakeAttacksEnabled(),
+            fakeAttacksCancelKey: StorageManager.loadFakeAttacksCancelKey(),
             currentRound: [],
             currentComponentIndex: 0,
             currentKeyIndex: 0,
@@ -33,8 +35,13 @@ class TrainingApp {
      */
     async init() {
         await this.componentManager.init();
+        this.componentManager.setFakeAttacksConfig(this.state.fakeAttacksEnabled, this.state.fakeAttacksCancelKey);
         this.ui.setRoundSize(this.state.roundSize);
         this.ui.setAutoAdvanceSettings(this.state.autoAdvance, this.state.autoAdvanceDelay);
+        this.ui.setFakeAttacksSettings(
+            this.state.fakeAttacksEnabled,
+            this.state.fakeAttacksCancelKey
+        );
         this.setupEventListeners();
     }
 
@@ -73,6 +80,22 @@ class TrainingApp {
 
         this.ui.elements.autoAdvanceDelayInput.addEventListener('input', (e) => this.handleAutoDelayInput(e));
         this.ui.elements.autoAdvanceDelayInput.addEventListener('blur', (e) => this.handleAutoDelayBlur(e));
+
+        // Fake attacks settings
+        this.ui.elements.fakeAttacksCheckbox.addEventListener('change', (e) => {
+            this.state.fakeAttacksEnabled = e.target.checked;
+            StorageManager.saveFakeAttacksEnabled(this.state.fakeAttacksEnabled);
+            this.componentManager.setFakeAttacksConfig(this.state.fakeAttacksEnabled, this.state.fakeAttacksCancelKey);
+        });
+
+        this.ui.elements.cancelKeyInput.addEventListener('input', (e) => {
+            const key = e.target.value.toLowerCase();
+            if (key.length > 0) {
+                this.state.fakeAttacksCancelKey = key;
+                StorageManager.saveFakeAttacksCancelKey(this.state.fakeAttacksCancelKey);
+                this.componentManager.setFakeAttacksConfig(this.state.fakeAttacksEnabled, this.state.fakeAttacksCancelKey);
+            }
+        });
 
         // Keyboard events
         document.addEventListener('keydown', (e) => this.handleKeyDown(e));
@@ -134,10 +157,13 @@ class TrainingApp {
 
         const component = this.state.currentRound[this.state.currentComponentIndex];
 
+        // Update component display with cancel key if it's a fake attack
+        const cancelKey = component.isFake ? component.cancelKey : null;
         this.ui.updateComponent(
             component,
             this.state.currentComponentIndex,
-            this.state.roundSize
+            this.state.roundSize,
+            cancelKey
         );
 
         const pb = this.statisticsManager.getPersonalBest(component.key);

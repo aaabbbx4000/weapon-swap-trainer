@@ -6,6 +6,8 @@ class ComponentManager {
     constructor() {
         this.weaponSlots = {};
         this.skills = ['Q', 'E'];
+        this.fakeAttacksEnabled = false;
+        this.cancelKey = 'x';
     }
 
     /**
@@ -13,6 +15,14 @@ class ComponentManager {
      */
     async init() {
         this.weaponSlots = StorageManager.loadWeaponSlots();
+    }
+
+    /**
+     * Set fake attacks configuration
+     */
+    setFakeAttacksConfig(enabled, cancelKey) {
+        this.fakeAttacksEnabled = enabled;
+        this.cancelKey = cancelKey;
     }
 
     /**
@@ -48,18 +58,42 @@ class ComponentManager {
             const weapon = this.weaponSlots[slot];
             if (weapon) {
                 for (const skill of this.skills) {
+                    // Add normal weapon skill
                     components.push({
                         key: `${slot},${skill}`,
                         description: `${weapon} ${skill}`,
                         slot: slot,
                         weapon: weapon,
-                        skill: skill
+                        skill: skill,
+                        isFake: false
                     });
+
+                    // Add fake attack variant if enabled and this skill supports it
+                    if (this.fakeAttacksEnabled && this.isFakeAttackSkill(weapon, skill)) {
+                        components.push({
+                            key: `${slot},${skill},${this.cancelKey}`,
+                            description: `${weapon} ${skill} Fake Attack`,
+                            slot: slot,
+                            weapon: weapon,
+                            skill: skill,
+                            isFake: true,
+                            cancelKey: this.cancelKey
+                        });
+                    }
                 }
             }
         }
 
         return components;
+    }
+
+    /**
+     * Check if a weapon-skill combination supports fake attacks
+     */
+    isFakeAttackSkill(weapon, skill) {
+        return FAKE_ATTACK_SKILLS.some(
+            fake => fake.weapon === weapon && fake.skill === skill
+        );
     }
 
     /**
