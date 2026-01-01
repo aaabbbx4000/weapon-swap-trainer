@@ -15,30 +15,42 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <h1>Weapon Swap Trainer</h1>
-            <p class="subtitle">Train weapon swap speed and execution</p>
-        </div>
-
-        <!-- Controls -->
-        <div class="controls">
-            <button id="startButton">Start Round</button>
-            <button id="stopButton" class="hidden">Stop Round</button>
-
-            <div class="round-size-control">
-                <label for="roundSizeInput">Skills per round:</label>
-                <input type="number" id="roundSizeInput" min="1" max="9999" value="20">
-            </div>
+            <div class="title-badge">V Rising</div>
+            <h1>Weapon Skill Trainer</h1>
+            <p class="subtitle">Master your weapon swaps and skill execution</p>
         </div>
 
         <!-- Main Display Area -->
         <div class="main-display">
             <!-- Welcome Screen -->
             <div id="welcomeScreen">
-                <h2 style="color: #00d9ff; margin-bottom: 20px;">Ready to train?</h2>
-                <p style="color: #a0a0a0; margin-bottom: 30px;">
-                    Complete random weapon skills as fast as you can.<br>
-                    Track your personal best for each skill!
+                <div class="welcome-icon">⚔️</div>
+                <h2 class="welcome-title">Ready to Train?</h2>
+                <p class="welcome-description">
+                    Test your speed and accuracy with random weapon skills.<br>
+                    Beat your personal bests and track your progress.
                 </p>
+                <div class="welcome-stats">
+                    <div class="welcome-stat">
+                        <div class="stat-icon">⚡</div>
+                        <div class="stat-text">Fast-paced</div>
+                    </div>
+                    <div class="welcome-stat">
+                        <div class="stat-icon">🎯</div>
+                        <div class="stat-text">Precision</div>
+                    </div>
+                    <div class="welcome-stat">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-text">Track PBs</div>
+                    </div>
+                </div>
+                <div class="welcome-controls">
+                    <button id="startButton" class="start-button-large">Start Training</button>
+                    <div class="round-size-control-inline">
+                        <label for="roundSizeInput">Round Size:</label>
+                        <input type="number" id="roundSizeInput" min="1" max="9999" value="20">
+                    </div>
+                </div>
             </div>
 
             <!-- Countdown Screen -->
@@ -48,16 +60,21 @@
 
             <!-- Training Screen -->
             <div id="trainingScreen" class="hidden">
-                <div class="progress-info">
-                    <span id="roundProgress">Skill 1 / 1</span>
+                <div class="training-header">
+                    <div class="progress-info">
+                        <span id="roundProgress">Skill 1 / 1</span>
+                    </div>
+                    <button id="stopButton" class="stop-button-inline">Stop Round</button>
                 </div>
                 <div class="weapon-display">
                     <div id="weaponName" class="weapon-name">Weapon</div>
                     <div id="keyIndicators"></div>
                     <img id="weaponImage" class="weapon-image" src="" alt="Weapon">
                 </div>
-                <div class="timer" id="timer">0.0s</div>
-                <div class="pb-display" id="pbDisplay"></div>
+                <div class="training-footer">
+                    <div class="timer" id="timer">0.0s</div>
+                    <div class="pb-display" id="pbDisplay"></div>
+                </div>
             </div>
 
             <!-- Results Screen -->
