@@ -2,6 +2,18 @@
 
 A V Rising weapon swap training application to help improve your weapon skill execution speed and build muscle memory.
 
+## Screenshots
+
+### Training Mode
+Practice weapon skills with visual feedback and real-time performance tracking.
+
+![Training Mode](images/showcase/train_weapons.png)
+
+### Weapon Configuration
+Easily configure your weapon loadout for slots 1-8.
+
+![Weapon Configuration](images/showcase/config_weapons.png)
+
 ## Features
 
 - **Training Mode**: Practice random weapon skills with real-time feedback
