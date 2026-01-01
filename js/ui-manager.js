@@ -21,6 +21,7 @@ class UIManager {
             // Buttons
             startButton: document.getElementById('startButton'),
             stopButton: document.getElementById('stopButton'),
+            newRoundButton: document.getElementById('newRoundButton'),
             resetButton: document.getElementById('resetButton'),
             viewPBsBtn: document.getElementById('viewPBsBtn'),
             configBtn: document.getElementById('configBtn'),

@@ -45,6 +45,7 @@ class TrainingApp {
         // Button events
         this.ui.elements.startButton.addEventListener('click', () => this.startRound());
         this.ui.elements.stopButton.addEventListener('click', () => this.stopRound());
+        this.ui.elements.newRoundButton.addEventListener('click', () => this.startRound());
         this.ui.elements.resetButton.addEventListener('click', () => this.resetPBs());
         this.ui.elements.viewPBsBtn.addEventListener('click', () => this.showPBModal());
         this.ui.elements.configBtn.addEventListener('click', () => this.showConfigModal());
