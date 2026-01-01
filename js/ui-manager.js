@@ -81,7 +81,7 @@ class UIManager {
     /**
      * Update weapon display
      */
-    updateComponent(component, currentIndex, totalCount, cancelKey = null) {
+    updateComponent(component, currentIndex, totalCount) {
         // Update weapon name - add "Fake Attack" in yellow if it's a fake
         if (component.isFake) {
             this.elements.weaponName.innerHTML = `${component.weapon} <span style="color: #ffd700;">Fake Attack</span>`;
@@ -100,7 +100,7 @@ class UIManager {
         this.elements.roundProgress.textContent = `Skill ${currentIndex + 1} / ${totalCount}`;
 
         const requiredKeys = this.parseKeys(component.key);
-        this.renderKeyIndicators(requiredKeys, component.isFake, cancelKey);
+        this.renderKeyIndicators(requiredKeys);
     }
 
     /**
@@ -113,7 +113,7 @@ class UIManager {
     /**
      * Render key indicators for weapon skill (slot number + skill letter + optional cancel key)
      */
-    renderKeyIndicators(requiredKeys, isFake, cancelKey = null) {
+    renderKeyIndicators(requiredKeys) {
         // requiredKeys already includes the cancel key for fake attacks, so just render them all
         const keysHTML = requiredKeys.map(key => {
             const displayKey = this.getDisplayKey(key);

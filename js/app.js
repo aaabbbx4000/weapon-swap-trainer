@@ -157,13 +157,11 @@ class TrainingApp {
 
         const component = this.state.currentRound[this.state.currentComponentIndex];
 
-        // Update component display with cancel key if it's a fake attack
-        const cancelKey = component.isFake ? component.cancelKey : null;
+        // Update component display
         this.ui.updateComponent(
             component,
             this.state.currentComponentIndex,
-            this.state.roundSize,
-            cancelKey
+            this.state.roundSize
         );
 
         const pb = this.statisticsManager.getPersonalBest(component.key);
