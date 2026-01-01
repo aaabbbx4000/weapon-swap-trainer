@@ -86,9 +86,10 @@ class UIManager {
         this.elements.weaponImage.src = weaponImagePath;
         this.elements.weaponImage.className = 'weapon-image';
 
-        // Update skill key overlay (just Q or E)
+        // Update skill key overlay (just Q or E) with position class
         this.elements.skillKeyOverlay.textContent = component.skill;
-        this.elements.skillKeyOverlay.className = 'skill-key-overlay';
+        const skillClass = component.skill.toLowerCase() === 'q' ? 'skill-q' : 'skill-e';
+        this.elements.skillKeyOverlay.className = `skill-key-overlay ${skillClass}`;
 
         this.elements.roundProgress.textContent = `Skill ${currentIndex + 1} / ${totalCount}`;
     }
@@ -104,19 +105,23 @@ class UIManager {
      * Update visual feedback based on progress
      */
     updateKeyIndicators(requiredKeys, currentKeyIndex) {
+        // Determine skill position class (Q = left, E = right)
+        const skillKey = requiredKeys[requiredKeys.length - 1]; // Last key is the skill (Q or E)
+        const skillClass = skillKey.toLowerCase() === 'q' ? 'skill-q' : 'skill-e';
+
         // Update weapon image and skill overlay based on progress
         if (currentKeyIndex === 0) {
             // No keys pressed yet
             this.elements.weaponImage.className = 'weapon-image';
-            this.elements.skillKeyOverlay.className = 'skill-key-overlay';
+            this.elements.skillKeyOverlay.className = `skill-key-overlay ${skillClass}`;
         } else if (currentKeyIndex === 1) {
             // Slot number pressed correctly (first key)
             this.elements.weaponImage.className = 'weapon-image';
-            this.elements.skillKeyOverlay.className = 'skill-key-overlay';
+            this.elements.skillKeyOverlay.className = `skill-key-overlay ${skillClass}`;
         } else if (currentKeyIndex >= requiredKeys.length) {
             // All keys pressed correctly (skill complete)
             this.elements.weaponImage.className = 'weapon-image weapon-complete';
-            this.elements.skillKeyOverlay.className = 'skill-key-overlay skill-complete';
+            this.elements.skillKeyOverlay.className = `skill-key-overlay ${skillClass} skill-complete`;
         }
     }
 
@@ -124,9 +129,13 @@ class UIManager {
      * Flash error on weapon image and skill overlay
      */
     flashKeyError(requiredKeys, callback) {
+        // Determine skill position class (Q = left, E = right)
+        const skillKey = requiredKeys[requiredKeys.length - 1]; // Last key is the skill (Q or E)
+        const skillClass = skillKey.toLowerCase() === 'q' ? 'skill-q' : 'skill-e';
+
         // Show error on weapon image and skill overlay
         this.elements.weaponImage.className = 'weapon-image weapon-error';
-        this.elements.skillKeyOverlay.className = 'skill-key-overlay skill-error';
+        this.elements.skillKeyOverlay.className = `skill-key-overlay ${skillClass} skill-error`;
 
         setTimeout(() => {
             callback();

@@ -121,8 +121,6 @@ h1 {
 .skill-key-overlay {
     position: absolute;
     top: 25px;
-    left: 50%;
-    transform: translateX(-50%);
     background: rgba(26, 26, 46, 0.9);
     border: 3px solid #666;
     border-radius: 8px;
@@ -134,6 +132,14 @@ h1 {
     transition: all 0.2s;
     pointer-events: none;
     z-index: 10;
+}
+
+.skill-key-overlay.skill-q {
+    left: 25px;
+}
+
+.skill-key-overlay.skill-e {
+    right: 25px;
 }
 
 .skill-key-overlay.skill-complete {
