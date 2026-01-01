@@ -23,7 +23,6 @@
         <div class="controls">
             <button id="startButton">Start Round</button>
             <button id="stopButton" class="hidden">Stop Round</button>
-            <button id="resetButton">Reset All PBs</button>
 
             <div class="round-size-control">
                 <label for="roundSizeInput">Skills per round:</label>
@@ -100,7 +99,10 @@
         <div class="modal-content">
             <div class="modal-header">Personal Bests</div>
             <div class="pb-list" id="pbListContent"></div>
-            <button class="close-modal" id="closeModalBtn">Close</button>
+            <div class="modal-buttons">
+                <button id="resetButton">Reset All PBs</button>
+                <button class="close-modal" id="closeModalBtn">Close</button>
+            </div>
         </div>
     </div>
 

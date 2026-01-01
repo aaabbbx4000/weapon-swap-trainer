@@ -245,27 +245,58 @@ class UIManager {
     }
 
     /**
-     * Render results list
+     * Render results list - grouped by component with averages
      */
     renderResultsList(results) {
         this.elements.resultsList.innerHTML = '';
 
-        const sortedResults = [...results].sort((a, b) => b.time - a.time);
+        // Group results by component name
+        const grouped = {};
+        results.forEach(result => {
+            if (!grouped[result.component]) {
+                grouped[result.component] = {
+                    times: [],
+                    totalErrors: 0,
+                    hasNewPB: false
+                };
+            }
+            grouped[result.component].times.push(result.time);
+            grouped[result.component].totalErrors += result.errors;
+            if (result.isNewPB) {
+                grouped[result.component].hasNewPB = true;
+            }
+        });
 
-        sortedResults.forEach((result, index) => {
+        // Calculate averages and create summary objects
+        const summaries = Object.entries(grouped).map(([component, data]) => {
+            const avgTime = data.times.reduce((sum, t) => sum + t, 0) / data.times.length;
+            return {
+                component,
+                avgTime,
+                totalErrors: data.totalErrors,
+                hasNewPB: data.hasNewPB,
+                attempts: data.times.length
+            };
+        });
+
+        // Sort by average time (slowest first)
+        const sortedSummaries = summaries.sort((a, b) => b.avgTime - a.avgTime);
+
+        // Render grouped results
+        sortedSummaries.forEach((summary, index) => {
             const item = document.createElement('div');
             item.className = 'result-item';
 
-            const errorDisplay = result.errors > 0
-                ? ` <span class="error-count">×${result.errors}</span>`
+            const errorDisplay = summary.totalErrors > 0
+                ? ` <span class="error-count">×${summary.totalErrors}</span>`
                 : '';
 
-            const pbBadge = result.isNewPB ? ' ★ NEW PB' : '';
-            const timeClass = result.isNewPB ? 'result-time-pb' : 'result-time';
+            const pbBadge = summary.hasNewPB ? ' ★ NEW PB' : '';
+            const timeClass = summary.hasNewPB ? 'result-time-pb' : 'result-time';
 
             item.innerHTML = `
-                <span>${index + 1}. ${result.component}${errorDisplay}</span>
-                <span class="${timeClass}">${result.time.toFixed(1)}s${pbBadge}</span>
+                <span>${index + 1}. ${summary.component}${errorDisplay}</span>
+                <span class="${timeClass}">${summary.avgTime.toFixed(1)}s${pbBadge}</span>
             `;
 
             this.elements.resultsList.appendChild(item);
