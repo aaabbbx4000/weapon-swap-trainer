@@ -300,7 +300,7 @@ class TrainingApp {
             this.ui.flashKeyError(requiredKeys, () => {
                 this.state.currentKeyIndex = 0;
                 this.ui.updateKeyIndicators(requiredKeys, this.state.currentKeyIndex);
-            });
+            }, this.state.currentKeyIndex);
         }
     }
 

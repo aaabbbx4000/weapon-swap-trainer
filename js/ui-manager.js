@@ -78,8 +78,8 @@ class UIManager {
      * Update weapon display
      */
     updateComponent(component, currentIndex, totalCount) {
-        // Update weapon name
-        this.elements.weaponName.textContent = component.weapon;
+        // Update weapon name with skill letter
+        this.elements.weaponName.textContent = `${component.weapon} ${component.skill}`;
 
         // Update weapon image
         const weaponImagePath = WEAPON_IMAGES[component.weapon];
@@ -115,27 +115,35 @@ class UIManager {
             this.elements.weaponImage.className = 'weapon-image';
             this.elements.skillKeyOverlay.className = `skill-key-overlay ${skillClass}`;
         } else if (currentKeyIndex === 1) {
-            // Slot number pressed correctly (first key)
-            this.elements.weaponImage.className = 'weapon-image';
+            // Slot number pressed correctly (weapon selected) - show green border on image
+            this.elements.weaponImage.className = 'weapon-image weapon-complete';
             this.elements.skillKeyOverlay.className = `skill-key-overlay ${skillClass}`;
         } else if (currentKeyIndex >= requiredKeys.length) {
-            // All keys pressed correctly (skill complete)
+            // All keys pressed correctly (skill complete) - show green on both image and overlay
             this.elements.weaponImage.className = 'weapon-image weapon-complete';
             this.elements.skillKeyOverlay.className = `skill-key-overlay ${skillClass} skill-complete`;
         }
     }
 
     /**
-     * Flash error on weapon image and skill overlay
+     * Flash error on weapon image and optionally skill overlay
      */
-    flashKeyError(requiredKeys, callback) {
+    flashKeyError(requiredKeys, callback, currentKeyIndex) {
         // Determine skill position class (Q = left, E = right)
         const skillKey = requiredKeys[requiredKeys.length - 1]; // Last key is the skill (Q or E)
         const skillClass = skillKey.toLowerCase() === 'q' ? 'skill-q' : 'skill-e';
 
-        // Show error on weapon image and skill overlay
+        // Show error on weapon image
         this.elements.weaponImage.className = 'weapon-image weapon-error';
-        this.elements.skillKeyOverlay.className = `skill-key-overlay ${skillClass} skill-error`;
+
+        // Only show red on Q/E overlay if they pressed the wrong skill key (second key)
+        if (currentKeyIndex === 1) {
+            // Wrong skill key (Q or E) - show red on overlay too
+            this.elements.skillKeyOverlay.className = `skill-key-overlay ${skillClass} skill-error`;
+        } else {
+            // Wrong weapon slot (first key) - keep Q/E overlay normal
+            this.elements.skillKeyOverlay.className = `skill-key-overlay ${skillClass}`;
+        }
 
         setTimeout(() => {
             callback();
