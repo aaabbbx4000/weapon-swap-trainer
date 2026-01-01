@@ -29,19 +29,19 @@ body {
 /* Header */
 .header {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
 }
 
 h1 {
-    font-size: 2.5em;
+    font-size: 2.2em;
     color: #00d9ff;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     text-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
 }
 
 .subtitle {
     color: #a0a0a0;
-    font-size: 1.1em;
+    font-size: 1em;
 }
 
 /* Main Display */
@@ -49,10 +49,10 @@ h1 {
     background: rgba(255, 255, 255, 0.05);
     border: 2px solid rgba(0, 217, 255, 0.3);
     border-radius: 15px;
-    padding: 50px;
+    padding: 40px;
     text-align: center;
     margin-bottom: 30px;
-    min-height: 300px;
+    min-height: 250px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -61,10 +61,10 @@ h1 {
 
 /* Countdown */
 .countdown {
-    font-size: 8em;
+    font-size: 6em;
     font-weight: bold;
     color: #00d9ff;
-    text-shadow: 0 0 30px rgba(0, 217, 255, 0.8);
+    text-shadow: 0 0 25px rgba(0, 217, 255, 0.8);
     animation: pulse 1s ease-in-out infinite;
 }
 
@@ -73,17 +73,48 @@ h1 {
     50% { transform: scale(1.1); }
 }
 
-/* Component Display */
-.component-display {
-    margin-bottom: 30px;
+/* Weapon Display */
+.weapon-display {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
 }
 
-.component-name {
-    font-size: 4em;
-    font-weight: bold;
-    color: #00d9ff;
-    text-shadow: 0 0 30px rgba(0, 217, 255, 0.8);
-    margin-bottom: 20px;
+.weapon-name {
+    font-size: 1.2em;
+    color: #e4e4e4;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: -5px;
+}
+
+.weapon-image {
+    width: 250px;
+    height: 250px;
+    object-fit: contain;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 15px;
+    transition: all 0.2s;
+}
+
+.weapon-image.weapon-slot-correct {
+    border-color: #00ff88;
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+}
+
+.weapon-image.weapon-complete {
+    border-color: #00ff88;
+    box-shadow: 0 0 25px rgba(0, 255, 136, 0.8);
+}
+
+.weapon-image.weapon-error {
+    border-color: #ff4444;
+    box-shadow: 0 0 15px rgba(255, 68, 68, 0.5);
 }
 
 /* Key Indicators */
@@ -99,39 +130,49 @@ h1 {
     transition: all 0.1s;
 }
 
+.skill-key {
+    padding: 12px 25px;
+    font-size: 2.5em;
+    font-weight: bold;
+    border: 3px solid #666;
+    border-radius: 8px;
+}
+
 .key-indicator.key-completed {
-    background: #00d9ff;
+    background: #00ff88;
     color: #000;
-    border-color: #00d9ff;
+    border-color: #00ff88;
     transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
 }
 
 .key-indicator.key-error {
     background: #ff4444;
     color: #fff;
     border-color: #ff4444;
+    box-shadow: 0 0 20px rgba(255, 68, 68, 0.5);
 }
 
 /* Timer */
 .timer {
-    font-size: 3em;
+    font-size: 2.5em;
     color: #ffd700;
     font-family: 'Courier New', monospace;
-    margin: 20px 0;
+    margin: 15px 0;
 }
 
 /* Progress Info */
 .progress-info {
-    font-size: 1.5em;
+    font-size: 1.3em;
     color: #a0a0a0;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 /* Personal Best Display */
 .pb-display {
-    font-size: 1.2em;
+    font-size: 1.1em;
     color: #00ff88;
-    margin-top: 10px;
+    margin-top: 8px;
 }
 
 .pb-display.new-pb {
@@ -148,15 +189,15 @@ h1 {
 /* Controls */
 .controls {
     display: flex;
-    gap: 15px;
+    gap: 12px;
     justify-content: center;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
     flex-wrap: wrap;
 }
 
 button {
-    padding: 15px 40px;
-    font-size: 1.2em;
+    padding: 12px 32px;
+    font-size: 1.1em;
     border: 2px solid #00d9ff;
     background: rgba(0, 217, 255, 0.1);
     color: #00d9ff;
@@ -209,12 +250,6 @@ button:disabled {
     box-shadow: 0 5px 20px rgba(255, 68, 68, 0.4);
 }
 
-.delete-btn {
-    padding: 5px 15px;
-    font-size: 0.9em;
-    border-color: #ff4444;
-    color: #ff4444;
-}
 
 /* Input Fields */
 input[type=number],
@@ -396,8 +431,9 @@ input[type=number] {
     padding: 30px;
     max-width: 500px;
     width: 90%;
-    max-height: 80vh;
+    max-height: 85vh;
     overflow-y: auto;
+    position: relative;
 }
 
 .modal-header {
@@ -405,6 +441,32 @@ input[type=number] {
     color: #00d9ff;
     margin-bottom: 20px;
     text-align: center;
+}
+
+.modal-close-x {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: #00d9ff;
+    font-size: 2em;
+    cursor: pointer;
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    line-height: 1;
+}
+
+.modal-close-x:hover {
+    color: #ff4444;
+    background: rgba(255, 68, 68, 0.1);
+    border-radius: 50%;
+    transform: rotate(90deg);
 }
 
 .close-modal {
@@ -435,16 +497,18 @@ input[type=number] {
 
 /* Config Modal */
 #configModal .modal-content {
-    max-width: 700px;
+    max-width: 600px;
+    max-height: 90vh;
 }
 
 .config-section {
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 .config-section h3 {
     color: #00d9ff;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
+    font-size: 1.2em;
 }
 
 .config-buttons {
@@ -459,40 +523,70 @@ input[type=number] {
     font-size: 1em;
 }
 
-.add-component-form {
+#weaponSlotsList {
     display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 5px;
 }
 
-.add-component-form input[type=text] {
+.weapon-slot-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.weapon-slot-label {
+    color: #00d9ff;
+    font-weight: bold;
+    min-width: 55px;
+    font-size: 0.95em;
+}
+
+.weapon-select {
     flex: 1;
-    font-family: 'Courier New', monospace;
-}
-
-.add-component-form input[type=text]:last-of-type {
-    flex: 2;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.add-component-form button {
-    padding: 10px 20px;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid #00d9ff;
+    border-radius: 5px;
+    color: #e4e4e4;
     font-size: 1em;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.weapon-select:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: #00ff88;
+}
+
+.weapon-select:focus {
+    outline: none;
+    border-color: #00ff88;
+    box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+}
+
+.weapon-select option {
+    background: #1a1a2e;
+    color: #e4e4e4;
 }
 
 .auto-skip-settings {
-    padding: 15px;
+    padding: 12px;
     background: rgba(255, 255, 255, 0.05);
     border-radius: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 0;
 }
 
 .auto-skip-settings h3 {
-    margin-bottom: 15px;
+    margin-bottom: 10px;
+    font-size: 1.2em;
 }
 
 .auto-skip-checkbox {
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -524,35 +618,6 @@ input[type=number] {
     text-align: center;
 }
 
-#componentsList {
-    max-height: 300px;
-    overflow-y: auto;
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 5px;
-    padding: 10px;
-}
-
-.config-component-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.config-component-info {
-    flex: 1;
-}
-
-.config-component-key {
-    font-family: 'Courier New', monospace;
-    color: #00d9ff;
-}
-
-.config-component-desc {
-    margin-left: 15px;
-    color: #e4e4e4;
-}
 
 /* Utility Classes */
 .hidden {

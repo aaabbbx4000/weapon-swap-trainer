@@ -1,117 +1,95 @@
 /**
- * Component Manager - Handles component operations
+ * Weapon Manager - Handles weapon slots and skill generation
  */
 
 class ComponentManager {
     constructor() {
-        this.components = [];
+        this.weaponSlots = {};
+        this.skills = ['Q', 'E'];
     }
 
     /**
-     * Initialize by loading components asynchronously
+     * Initialize by loading weapon slots
      */
     async init() {
-        this.components = await StorageManager.loadComponents();
+        this.weaponSlots = StorageManager.loadWeaponSlots();
     }
 
     /**
-     * Get all components
+     * Get weapon slots configuration
      */
-    getAll() {
-        return this.components;
+    getWeaponSlots() {
+        return this.weaponSlots;
     }
 
     /**
-     * Add a new component
+     * Update weapon for a specific slot
      */
-    add(key, description) {
-        if (!key || !description) {
-            throw new Error('Key and description are required');
+    setWeaponSlot(slot, weaponName) {
+        if (slot < 1 || slot > 8) {
+            throw new Error('Slot must be between 1 and 8');
         }
 
-        if (this.exists(key)) {
-            throw new Error('A component with this key already exists');
+        if (weaponName && !WEAPONS.includes(weaponName)) {
+            throw new Error('Invalid weapon name');
         }
 
-        this.components.push({ key, description });
+        this.weaponSlots[slot] = weaponName;
         this.save();
     }
 
     /**
-     * Delete a component by index
+     * Get all possible weapon skills from current configuration
      */
-    delete(index) {
-        if (index < 0 || index >= this.components.length) {
-            throw new Error('Invalid component index');
+    getAllComponents() {
+        const skills = [];
+
+        for (let slot = 1; slot <= 8; slot++) {
+            const weapon = this.weaponSlots[slot];
+            if (weapon) {
+                for (const skill of this.skills) {
+                    skills.push({
+                        key: `${slot},${skill}`,
+                        description: `${weapon} ${skill}`,
+                        slot: slot,
+                        weapon: weapon,
+                        skill: skill
+                    });
+                }
+            }
         }
 
-        this.components.splice(index, 1);
-        this.save();
+        return skills;
     }
 
     /**
-     * Check if a component with the given key exists
-     */
-    exists(key) {
-        return this.components.some(c => c.key === key);
-    }
-
-    /**
-     * Import components from array
-     */
-    import(componentsArray) {
-        if (!Array.isArray(componentsArray)) {
-            throw new Error('Invalid format: JSON must be an array of components');
-        }
-
-        const valid = componentsArray.every(c => c.key && c.description);
-        if (!valid) {
-            throw new Error('Invalid format: Each component must have "key" and "description"');
-        }
-
-        this.components = [...componentsArray];
-        this.save();
-    }
-
-    /**
-     * Export components as JSON string
-     */
-    export() {
-        return JSON.stringify(this.components, null, 2);
-    }
-
-    /**
-     * Find component by key
+     * Find weapon skill by key
      */
     findByKey(key) {
-        return this.components.find(c => c.key === key);
+        const skills = this.getAllComponents();
+        return skills.find(c => c.key === key);
     }
 
     /**
-     * Get component count
-     */
-    count() {
-        return this.components.length;
-    }
-
-    /**
-     * Generate random round of components
+     * Generate random round of weapon skills
      */
     generateRound(size) {
-        if (this.components.length === 0) {
-            throw new Error('No components configured');
+        const skills = this.getAllComponents();
+
+        if (skills.length === 0) {
+            throw new Error('No weapons configured in slots. Please configure weapons in slots 1-8.');
         }
 
         const round = [];
-        const availableComponents = [...this.components];
+        const availableSkills = [...skills];
 
         for (let i = 0; i < size; i++) {
-            const randomIndex = Math.floor(Math.random() * availableComponents.length);
-            round.push(availableComponents[randomIndex]);
-            availableComponents.splice(randomIndex, 1);
+            const randomIndex = Math.floor(Math.random() * availableSkills.length);
+            round.push(availableSkills[randomIndex]);
+            availableSkills.splice(randomIndex, 1);
 
-            if (availableComponents.length === 0) {
-                availableComponents.push(...this.components);
+            if (availableSkills.length === 0) {
+                availableSkills.push(...skills);
             }
         }
 
@@ -119,9 +97,9 @@ class ComponentManager {
     }
 
     /**
-     * Save components to storage
+     * Save weapon slots to storage
      */
     save() {
-        StorageManager.saveComponents(this.components);
+        StorageManager.saveWeaponSlots(this.weaponSlots);
     }
 }

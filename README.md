@@ -1,14 +1,14 @@
-# Component Trainer
+# Weapon Swap Trainer
 
-A V Rising weapon swap training application to help improve your component execution speed and build muscle memory.
+A V Rising weapon swap training application to help improve your weapon skill execution speed and build muscle memory.
 
 ## Features
 
-- **Training Mode**: Practice random components with real-time feedback
-- **Personal Bests**: Track your best time for each component
+- **Training Mode**: Practice random weapon skills with real-time feedback
+- **Personal Bests**: Track your best time for each weapon skill
 - **Statistics**: View average, fastest, and slowest times after each round
-- **Customizable Components**: Add, remove, or import/export your own component lists
-- **Auto-Skip Option**: Automatically advance to the next component after a time limit
+- **Weapon Selection**: Configure which weapons are in slots 1-8
+- **Auto-Skip Option**: Automatically advance to the next skill after a time limit
 - **Progress Tracking**: See your times during the round and track improvements
 
 ## Getting Started
@@ -26,38 +26,37 @@ That's it! No installation or build process needed.
 ### Training
 1. Click **"Start Round"** to begin
 2. A 3-second countdown will appear
-3. Press the key sequence shown on screen (e.g., press `1`, then `Q`)
-4. Complete all components in the round
+3. Press the key sequence shown (e.g., press `1` for the weapon slot, then `Q` for the skill)
+4. Complete all weapon skills in the round
 5. View your results and personal bests
 
-### Configuring Components
+### Configuring Weapons
 
-Click the **"Configure"** button to customize your training:
+Click the **"Configure"** button to set up your weapon slots:
 
-#### Adding Components
-1. Enter the key combination (e.g., `1,e` or `2,LeftMouseButton`)
-2. Enter a description (e.g., "crossbow attack")
-3. Click "Add"
-
-#### Import/Export
-- **Export**: Save your components as a JSON file
-- **Import**: Load components from a previously saved JSON file
+#### Weapon Slots (1-8)
+- Select which weapon you want in each slot (1-8)
+- Each weapon has two skills: Q and E
+- During training, you'll practice random weapon skills based on your configuration
+- Available weapons:
+  - Spear, Slasher, Axe, Mace, Sword, Crossbow, Greatsword, Whip
+  - LongBow, Dagger, Claw, TwinBlade, Pistols, Reaper
 
 ### Settings
 
-- **Components per round**: Choose how many components to practice (1-9999)
+- **Skills per round**: Choose how many weapon skills to practice (1-9999)
 - **Auto-skip**: Enable automatic advancement after a time limit (adjustable from 0.1 to 10 seconds)
 
 ## Key Features Explained
 
 ### Personal Bests
-The app automatically tracks your fastest time for each component. When you beat a personal best, you'll see a ★ indicator and "NEW PB!" message.
+The app automatically tracks your fastest time for each weapon skill. When you beat a personal best, you'll see a ★ indicator and "NEW PB!" message.
 
 ### Round Statistics
 After each round, view:
 - **Average Time**: Your mean completion time
-- **Fastest**: Your quickest component
-- **Slowest**: Your slowest component
+- **Fastest**: Your quickest skill
+- **Slowest**: Your slowest skill
 - **New PBs**: How many personal bests you achieved
 
 ### Error Tracking
@@ -65,18 +64,27 @@ If you press the wrong key, the indicators will flash red and reset. Errors are 
 
 ## Keyboard Shortcuts
 
-- **Any Key**: Use during training to execute components
+- **Any Key**: Use during training to execute weapon skills
 - **Escape**: Close open modals
-- **Enter**: Add a new component (when typing in the description field)
 
-## Default Components
+## Default Weapon Configuration
 
-On first run, the app automatically loads components from the included `components.json` file (common V Rising weapon components). If the file is missing, the app starts with an empty component list. You can always import the `components.json` file later through the Configure menu.
+On first run, the app loads with these default weapons in slots 1-8:
+1. LongBow
+2. Reaper
+3. Spear
+4. Axe
+5. Slasher
+6. Pistols
+7. Sword
+8. Greatsword
+
+You can customize these at any time through the Configure menu.
 
 ## Data Storage
 
 All your data is saved locally in your browser:
-- Your component list
+- Your weapon slot configuration
 - All personal best times
 - Your preferences (round size, auto-skip settings)
 
@@ -92,7 +100,7 @@ Works in all modern browsers:
 
 ## Tips for Best Results
 
-1. **Start with smaller rounds** (5-10 components) to build consistency
+1. **Start with smaller rounds** (5-10 skills) to build consistency
 2. **Use auto-skip** to maintain rhythm and prevent overthinking
 3. **Focus on accuracy first**, then speed
 4. **Track your progress** by reviewing your personal bests regularly

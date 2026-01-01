@@ -31,7 +31,8 @@ class UIManager {
 
             // Displays
             countdownNumber: document.getElementById('countdownNumber'),
-            componentName: document.getElementById('componentName'),
+            weaponName: document.getElementById('weaponName'),
+            weaponImage: document.getElementById('weaponImage'),
             keyIndicators: document.getElementById('keyIndicators'),
             timer: document.getElementById('timer'),
             pbDisplay: document.getElementById('pbDisplay'),
@@ -51,10 +52,7 @@ class UIManager {
             roundSizeInput: document.getElementById('roundSizeInput'),
             autoAdvanceCheckbox: document.getElementById('autoAdvanceCheckbox'),
             autoAdvanceDelayInput: document.getElementById('autoAdvanceDelayInput'),
-            componentsList: document.getElementById('componentsList'),
-            componentsListHeader: document.getElementById('componentsListHeader'),
-            newComponentKey: document.getElementById('newComponentKey'),
-            newComponentDesc: document.getElementById('newComponentDesc'),
+            weaponSlotsList: document.getElementById('weaponSlotsList'),
             pbListContent: document.getElementById('pbListContent')
         };
     }
@@ -77,11 +75,18 @@ class UIManager {
     }
 
     /**
-     * Update component display
+     * Update weapon display
      */
     updateComponent(component, currentIndex, totalCount) {
-        this.elements.componentName.textContent = component.description;
-        this.elements.roundProgress.textContent = `Component ${currentIndex + 1} / ${totalCount}`;
+        // Update weapon name
+        this.elements.weaponName.textContent = component.weapon;
+
+        // Update weapon image
+        const weaponImagePath = WEAPON_IMAGES[component.weapon];
+        this.elements.weaponImage.src = weaponImagePath;
+        this.elements.weaponImage.className = 'weapon-image';
+
+        this.elements.roundProgress.textContent = `Skill ${currentIndex + 1} / ${totalCount}`;
 
         const requiredKeys = this.parseKeys(component.key);
         this.renderKeyIndicators(requiredKeys);
@@ -95,14 +100,14 @@ class UIManager {
     }
 
     /**
-     * Render key indicators
+     * Render key indicators for weapon skill (slot number + skill letter)
      */
     renderKeyIndicators(requiredKeys) {
         this.elements.keyIndicators.innerHTML = requiredKeys.map(key => {
             const displayKey = this.getDisplayKey(key);
             const elementId = this.getKeyElementId(key);
 
-            return `<span id="${elementId}" class="key-indicator">${displayKey}</span>`;
+            return `<span id="${elementId}" class="key-indicator skill-key">${displayKey}</span>`;
         }).join('');
     }
 
@@ -121,7 +126,7 @@ class UIManager {
     }
 
     /**
-     * Update key indicators based on progress
+     * Update key indicators based on progress (slot and skill)
      */
     updateKeyIndicators(requiredKeys, currentKeyIndex) {
         requiredKeys.forEach((key, index) => {
@@ -131,21 +136,37 @@ class UIManager {
             if (!element) return;
 
             if (index < currentKeyIndex) {
-                element.className = 'key-indicator key-completed';
+                element.className = 'key-indicator skill-key key-completed';
             } else {
-                element.className = 'key-indicator';
+                element.className = 'key-indicator skill-key';
             }
         });
+
+        // Update weapon image border based on progress
+        if (currentKeyIndex === 0) {
+            // No keys pressed yet
+            this.elements.weaponImage.className = 'weapon-image';
+        } else if (currentKeyIndex === 1) {
+            // Slot number pressed correctly
+            this.elements.weaponImage.className = 'weapon-image weapon-slot-correct';
+        } else if (currentKeyIndex >= requiredKeys.length) {
+            // All keys pressed correctly
+            this.elements.weaponImage.className = 'weapon-image weapon-complete';
+        }
     }
 
     /**
-     * Flash error on key indicators
+     * Flash error on weapon image and key indicators
      */
     flashKeyError(requiredKeys, callback) {
+        // Show error on weapon image
+        this.elements.weaponImage.className = 'weapon-image weapon-error';
+
+        // Show error on key indicators
         requiredKeys.forEach(key => {
             const element = document.getElementById(this.getKeyElementId(key));
             if (element) {
-                element.className = 'key-indicator key-error';
+                element.className = 'key-indicator skill-key key-error';
             }
         });
 
@@ -223,7 +244,7 @@ class UIManager {
         this.elements.newPBCount.textContent = stats.newPBCount;
 
         if (results.length < roundSize) {
-            this.elements.resultsTitle.textContent = `Round Stopped (${results.length}/${roundSize} components)`;
+            this.elements.resultsTitle.textContent = `Round Stopped (${results.length}/${roundSize} skills)`;
         } else {
             this.elements.resultsTitle.textContent = 'Round Complete!';
         }
@@ -312,36 +333,34 @@ class UIManager {
     }
 
     /**
-     * Render components list in config
+     * Render weapon slots configuration
      */
-    renderComponentsList(components, deleteCallback) {
-        this.elements.componentsListHeader.textContent = `Components (${components.length})`;
-        this.elements.componentsList.innerHTML = '';
+    renderWeaponSlots(weaponSlots, changeCallback) {
+        this.elements.weaponSlotsList.innerHTML = '';
 
-        components.forEach((comp, index) => {
+        for (let slot = 1; slot <= 8; slot++) {
             const item = document.createElement('div');
-            item.className = 'config-component-item';
+            item.className = 'weapon-slot-item';
+
+            const currentWeapon = weaponSlots[slot] || '';
+
             item.innerHTML = `
-                <div class="config-component-info">
-                    <span class="config-component-key">[${comp.key}]</span>
-                    <span class="config-component-desc">${comp.description}</span>
-                </div>
-                <button class="delete-btn" data-index="${index}">Delete</button>
+                <label class="weapon-slot-label">Slot ${slot}:</label>
+                <select class="weapon-select" data-slot="${slot}">
+                    <option value="">-- Select Weapon --</option>
+                    ${WEAPONS.map(weapon =>
+                        `<option value="${weapon}" ${currentWeapon === weapon ? 'selected' : ''}>${weapon}</option>`
+                    ).join('')}
+                </select>
             `;
 
-            const deleteBtn = item.querySelector('.delete-btn');
-            deleteBtn.addEventListener('click', () => deleteCallback(index));
+            const select = item.querySelector('.weapon-select');
+            select.addEventListener('change', (e) => {
+                changeCallback(slot, e.target.value);
+            });
 
-            this.elements.componentsList.appendChild(item);
-        });
-    }
-
-    /**
-     * Clear component input fields
-     */
-    clearComponentInputs() {
-        this.elements.newComponentKey.value = '';
-        this.elements.newComponentDesc.value = '';
+            this.elements.weaponSlotsList.appendChild(item);
+        }
     }
 
     /**

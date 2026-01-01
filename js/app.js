@@ -51,7 +51,7 @@ class TrainingApp {
 
         // Modal events
         document.getElementById('closeModalBtn').addEventListener('click', () => this.closePBModal());
-        document.getElementById('closeConfigBtn').addEventListener('click', () => this.closeConfigModal());
+        document.getElementById('closeConfigBtnX').addEventListener('click', () => this.closeConfigModal());
 
         this.ui.elements.pbModal.addEventListener('click', (e) => {
             if (e.target === this.ui.elements.pbModal) this.closePBModal();
@@ -60,13 +60,6 @@ class TrainingApp {
         this.ui.elements.configModal.addEventListener('click', (e) => {
             if (e.target === this.ui.elements.configModal) this.closeConfigModal();
         });
-
-        // Config events
-        document.getElementById('importBtn').addEventListener('click', () => this.importComponents());
-        document.getElementById('exportBtn').addEventListener('click', () => this.exportComponents());
-        document.getElementById('addComponentBtn').addEventListener('click', () => this.addComponent());
-
-        document.getElementById('importFileInput').addEventListener('change', (e) => this.handleImportFile(e));
 
         // Settings inputs
         this.ui.elements.roundSizeInput.addEventListener('input', (e) => this.handleRoundSizeInput(e));
@@ -83,11 +76,6 @@ class TrainingApp {
         // Keyboard events
         document.addEventListener('keydown', (e) => this.handleKeyDown(e));
         document.addEventListener('mousedown', (e) => this.handleMouseDown(e));
-
-        // Enter key to add component
-        this.ui.elements.newComponentDesc.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') this.addComponent();
-        });
     }
 
     /**
@@ -345,7 +333,7 @@ class TrainingApp {
      * Show config modal
      */
     showConfigModal() {
-        this.renderComponentsList();
+        this.renderWeaponSlots();
         this.ui.showModal(this.ui.elements.configModal, true);
     }
 
@@ -357,88 +345,25 @@ class TrainingApp {
     }
 
     /**
-     * Render components list
+     * Render weapon slots configuration
      */
-    renderComponentsList() {
-        const components = this.componentManager.getAll();
-        this.ui.renderComponentsList(components, (index) => this.deleteComponent(index));
+    renderWeaponSlots() {
+        const weaponSlots = this.componentManager.getWeaponSlots();
+        this.ui.renderWeaponSlots(weaponSlots, (slot, weaponName) => {
+            this.handleWeaponSlotChange(slot, weaponName);
+        });
     }
 
     /**
-     * Add new component
+     * Handle weapon slot change
      */
-    addComponent() {
-        const key = this.ui.elements.newComponentKey.value.trim();
-        const desc = this.ui.elements.newComponentDesc.value.trim();
-
+    handleWeaponSlotChange(slot, weaponName) {
         try {
-            this.componentManager.add(key, desc);
-            this.renderComponentsList();
-            this.ui.clearComponentInputs();
+            this.componentManager.setWeaponSlot(slot, weaponName);
         } catch (error) {
             alert(error.message);
+            this.renderWeaponSlots();
         }
-    }
-
-    /**
-     * Delete component
-     */
-    deleteComponent(index) {
-        const components = this.componentManager.getAll();
-        const comp = components[index];
-
-        if (confirm(`Delete "${comp.description}" [${comp.key}]?`)) {
-            this.componentManager.delete(index);
-            this.renderComponentsList();
-        }
-    }
-
-    /**
-     * Import components from file
-     */
-    importComponents() {
-        document.getElementById('importFileInput').click();
-    }
-
-    /**
-     * Handle import file selection
-     */
-    handleImportFile(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            try {
-                const imported = JSON.parse(e.target.result);
-
-                if (confirm(`Import ${imported.length} components? This will replace your current components.`)) {
-                    this.componentManager.import(imported);
-                    this.renderComponentsList();
-                    alert('Components imported successfully!');
-                }
-            } catch (error) {
-                alert('Error: ' + error.message);
-            }
-        };
-        reader.readAsText(file);
-        event.target.value = '';
-    }
-
-    /**
-     * Export components to file
-     */
-    exportComponents() {
-        const dataStr = this.componentManager.export();
-        const blob = new Blob([dataStr], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'components.json';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
     }
 
     /**
