@@ -374,9 +374,17 @@ class TrainingApp {
      */
     renderWeaponSlots() {
         const weaponSlots = this.componentManager.getWeaponSlots();
-        this.ui.renderWeaponSlots(weaponSlots, (slot, weaponName) => {
-            this.handleWeaponSlotChange(slot, weaponName);
-        });
+        const slotKeybindings = this.componentManager.getSlotKeybindings();
+        this.ui.renderWeaponSlots(
+            weaponSlots,
+            slotKeybindings,
+            (slot, weaponName) => {
+                this.handleWeaponSlotChange(slot, weaponName);
+            },
+            (slot, key) => {
+                this.handleSlotKeybindingChange(slot, key);
+            }
+        );
     }
 
     /**
@@ -385,6 +393,20 @@ class TrainingApp {
     handleWeaponSlotChange(slot, weaponName) {
         try {
             this.componentManager.setWeaponSlot(slot, weaponName);
+        } catch (error) {
+            alert(error.message);
+            this.renderWeaponSlots();
+        }
+    }
+
+    /**
+     * Handle slot keybinding change
+     */
+    handleSlotKeybindingChange(slot, key) {
+        try {
+            if (key.length > 0) {
+                this.componentManager.setSlotKeybinding(slot, key);
+            }
         } catch (error) {
             alert(error.message);
             this.renderWeaponSlots();

@@ -34,6 +34,7 @@ const CONFIG = {
         AUTO_ADVANCE: 'autoAdvance',
         AUTO_ADVANCE_DELAY: 'autoAdvanceDelay',
         WEAPON_SLOTS: 'weaponSlots',
+        SLOT_KEYBINDINGS: 'slotKeybindings',
         FAKE_ATTACKS_ENABLED: 'fakeAttacksEnabled',
         FAKE_ATTACKS_CANCEL_KEY: 'fakeAttacksCancelKey'
     }
@@ -109,6 +110,18 @@ const DEFAULT_WEAPON_SLOTS = {
     6: 'Pistols',
     7: 'Sword',
     8: 'Greatsword'
+};
+
+// Default keybindings for weapon slots (slot number -> key)
+const DEFAULT_SLOT_KEYBINDINGS = {
+    1: '1',
+    2: '2',
+    3: '3',
+    4: '4',
+    5: '5',
+    6: '6',
+    7: '7',
+    8: '8'
 };
 
 // Weapon skills that support fake attacks (weapon-skill pairs)

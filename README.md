@@ -20,6 +20,7 @@ Easily configure your weapon loadout for slots 1-8.
 - **Personal Bests**: Track your best time for each weapon skill
 - **Statistics**: View average, fastest, and slowest times after each round
 - **Weapon Selection**: Configure which weapons are in slots 1-8
+- **Custom Keybindings**: Match your in-game weapon slot keybindings (e.g., F, R, V instead of 1, 2, 3)
 - **Auto-Skip Option**: Automatically advance to the next skill after a time limit
 - **Progress Tracking**: See your times during the round and track improvements
 - **Weapon Fake Attacks**: Practice cancellation mechanics for advanced PvP techniques
@@ -49,6 +50,9 @@ Click the **"Configure"** button to set up your weapon slots:
 
 #### Weapon Slots (1-8)
 - Select which weapon you want in each slot (1-8)
+- **Customize slot keybindings** to match your in-game bindings (default: 1-8)
+  - Click the key input box next to each slot to set a custom key
+  - Example: Change slot 1 from "1" to "F" if you use F for your first weapon slot
 - Each weapon has two skills: Q and E
 - During training, you'll practice random weapon skills based on your configuration
 - Available weapons:
@@ -59,6 +63,25 @@ Click the **"Configure"** button to set up your weapon slots:
 
 - **Skills per round**: Choose how many weapon skills to practice (1-9999)
 - **Auto-skip**: Enable automatic advancement after a time limit (adjustable from 0.1 to 10 seconds)
+
+### Custom Keybindings
+
+The trainer supports **custom keybindings for weapon slots** to match your in-game setup:
+
+#### Why Custom Keybindings?
+Many players use custom keybindings instead of the default 1-8 for weapon slots. For example:
+- Using `F`, `R`, `V`, etc. for easier reach
+- Using mouse buttons or other keys for comfort
+- Matching specific PvP layouts
+
+#### How to Set Up
+1. Go to **Configure** → **Weapon Slots**
+2. For each slot, you'll see a small input box before the weapon dropdown
+3. Click the box and type your custom key (e.g., change "1" to "F")
+4. The trainer will now show and accept your custom keys during training
+
+#### Example
+If you bind slot 1 to "F" and select Greatsword, the trainer will display "F" + "Q" instead of "1" + "Q" when training Greatsword Q.
 
 ### Weapon Fake Attacks
 

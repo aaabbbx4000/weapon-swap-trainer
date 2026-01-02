@@ -5,16 +5,18 @@
 class ComponentManager {
     constructor() {
         this.weaponSlots = {};
+        this.slotKeybindings = {};
         this.skills = ['Q', 'E'];
         this.fakeAttacksEnabled = false;
         this.cancelKey = 'x';
     }
 
     /**
-     * Initialize by loading weapon slots
+     * Initialize by loading weapon slots and keybindings
      */
     async init() {
         this.weaponSlots = StorageManager.loadWeaponSlots();
+        this.slotKeybindings = StorageManager.loadSlotKeybindings();
     }
 
     /**
@@ -49,6 +51,29 @@ class ComponentManager {
     }
 
     /**
+     * Get slot keybindings configuration
+     */
+    getSlotKeybindings() {
+        return this.slotKeybindings;
+    }
+
+    /**
+     * Update keybinding for a specific slot
+     */
+    setSlotKeybinding(slot, key) {
+        if (slot < 1 || slot > 8) {
+            throw new Error('Slot must be between 1 and 8');
+        }
+
+        if (!key || key.length === 0) {
+            throw new Error('Key cannot be empty');
+        }
+
+        this.slotKeybindings[slot] = key;
+        this.saveKeybindings();
+    }
+
+    /**
      * Get all possible weapon skills from current configuration
      */
     getAllComponents() {
@@ -56,13 +81,16 @@ class ComponentManager {
 
         for (let slot = 1; slot <= 8; slot++) {
             const weapon = this.weaponSlots[slot];
+            const slotKey = this.slotKeybindings[slot] || slot.toString();
+
             if (weapon) {
                 for (const skill of this.skills) {
                     // Add normal weapon skill
                     components.push({
-                        key: `${slot},${skill}`,
+                        key: `${slotKey},${skill}`,
                         description: `${weapon} ${skill}`,
                         slot: slot,
+                        slotKey: slotKey,
                         weapon: weapon,
                         skill: skill,
                         isFake: false
@@ -71,9 +99,10 @@ class ComponentManager {
                     // Add fake attack variant if enabled and this skill supports it
                     if (this.fakeAttacksEnabled && this.isFakeAttackSkill(weapon, skill)) {
                         components.push({
-                            key: `${slot},${skill},${this.cancelKey}`,
+                            key: `${slotKey},${skill},${this.cancelKey}`,
                             description: `${weapon} ${skill} Fake Attack`,
                             slot: slot,
+                            slotKey: slotKey,
                             weapon: weapon,
                             skill: skill,
                             isFake: true,
@@ -135,5 +164,12 @@ class ComponentManager {
      */
     save() {
         StorageManager.saveWeaponSlots(this.weaponSlots);
+    }
+
+    /**
+     * Save slot keybindings to storage
+     */
+    saveKeybindings() {
+        StorageManager.saveSlotKeybindings(this.slotKeybindings);
     }
 }

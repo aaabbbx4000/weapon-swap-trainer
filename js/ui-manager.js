@@ -365,7 +365,7 @@ class UIManager {
     /**
      * Render weapon slots configuration
      */
-    renderWeaponSlots(weaponSlots, changeCallback) {
+    renderWeaponSlots(weaponSlots, slotKeybindings, weaponChangeCallback, keybindingChangeCallback) {
         this.elements.weaponSlotsList.innerHTML = '';
 
         for (let slot = 1; slot <= 8; slot++) {
@@ -373,9 +373,13 @@ class UIManager {
             item.className = 'weapon-slot-item';
 
             const currentWeapon = weaponSlots[slot] || '';
+            const currentKey = slotKeybindings[slot] || slot.toString();
 
             item.innerHTML = `
                 <label class="weapon-slot-label">Slot ${slot}:</label>
+                <input type="text" class="slot-key-input" data-slot="${slot}"
+                       maxlength="1" value="${currentKey}"
+                       style="width: 40px; text-align: center; margin-right: 8px;">
                 <select class="weapon-select" data-slot="${slot}">
                     <option value="">-- Select Weapon --</option>
                     ${WEAPONS.map(weapon =>
@@ -386,7 +390,12 @@ class UIManager {
 
             const select = item.querySelector('.weapon-select');
             select.addEventListener('change', (e) => {
-                changeCallback(slot, e.target.value);
+                weaponChangeCallback(slot, e.target.value);
+            });
+
+            const keyInput = item.querySelector('.slot-key-input');
+            keyInput.addEventListener('input', (e) => {
+                keybindingChangeCallback(slot, e.target.value);
             });
 
             this.elements.weaponSlotsList.appendChild(item);

@@ -107,4 +107,19 @@ class StorageManager {
     static saveFakeAttacksCancelKey(key) {
         localStorage.setItem(CONFIG.STORAGE_KEYS.FAKE_ATTACKS_CANCEL_KEY, key);
     }
+
+    /**
+     * Load slot keybindings from localStorage
+     */
+    static loadSlotKeybindings() {
+        const saved = localStorage.getItem(CONFIG.STORAGE_KEYS.SLOT_KEYBINDINGS);
+        return saved ? JSON.parse(saved) : { ...DEFAULT_SLOT_KEYBINDINGS };
+    }
+
+    /**
+     * Save slot keybindings to localStorage
+     */
+    static saveSlotKeybindings(slotKeybindings) {
+        localStorage.setItem(CONFIG.STORAGE_KEYS.SLOT_KEYBINDINGS, JSON.stringify(slotKeybindings));
+    }
 }
