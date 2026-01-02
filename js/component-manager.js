@@ -23,6 +23,15 @@ class ComponentManager {
      * Set fake attacks configuration
      */
     setFakeAttacksConfig(enabled, cancelKey) {
+        // Check if cancel key conflicts with any slot keybinding
+        if (enabled && cancelKey) {
+            for (let slot = 1; slot <= 8; slot++) {
+                if (this.slotKeybindings[slot] && this.slotKeybindings[slot].toLowerCase() === cancelKey.toLowerCase()) {
+                    throw new Error(`Cancellation key "${cancelKey}" is already assigned to slot ${slot}`);
+                }
+            }
+        }
+
         this.fakeAttacksEnabled = enabled;
         this.cancelKey = cancelKey;
     }
@@ -67,6 +76,18 @@ class ComponentManager {
 
         if (!key || key.length === 0) {
             throw new Error('Key cannot be empty');
+        }
+
+        // Check for duplicate slot keybindings
+        for (let i = 1; i <= 8; i++) {
+            if (i !== slot && this.slotKeybindings[i] && this.slotKeybindings[i].toLowerCase() === key.toLowerCase()) {
+                throw new Error(`Key "${key}" is already assigned to slot ${i}`);
+            }
+        }
+
+        // Check if key conflicts with cancel key
+        if (this.fakeAttacksEnabled && this.cancelKey && this.cancelKey.toLowerCase() === key.toLowerCase()) {
+            throw new Error(`Key "${key}" is already used as the cancellation key`);
         }
 
         this.slotKeybindings[slot] = key;

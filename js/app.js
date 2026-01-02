@@ -83,17 +83,30 @@ class TrainingApp {
 
         // Fake attacks settings
         this.ui.elements.fakeAttacksCheckbox.addEventListener('change', (e) => {
-            this.state.fakeAttacksEnabled = e.target.checked;
-            StorageManager.saveFakeAttacksEnabled(this.state.fakeAttacksEnabled);
-            this.componentManager.setFakeAttacksConfig(this.state.fakeAttacksEnabled, this.state.fakeAttacksCancelKey);
+            try {
+                this.state.fakeAttacksEnabled = e.target.checked;
+                StorageManager.saveFakeAttacksEnabled(this.state.fakeAttacksEnabled);
+                this.componentManager.setFakeAttacksConfig(this.state.fakeAttacksEnabled, this.state.fakeAttacksCancelKey);
+            } catch (error) {
+                alert(error.message);
+                // Revert checkbox
+                e.target.checked = !e.target.checked;
+                this.state.fakeAttacksEnabled = e.target.checked;
+            }
         });
 
         this.ui.elements.cancelKeyInput.addEventListener('input', (e) => {
             const key = e.target.value.toLowerCase();
             if (key.length > 0) {
-                this.state.fakeAttacksCancelKey = key;
-                StorageManager.saveFakeAttacksCancelKey(this.state.fakeAttacksCancelKey);
-                this.componentManager.setFakeAttacksConfig(this.state.fakeAttacksEnabled, this.state.fakeAttacksCancelKey);
+                try {
+                    this.state.fakeAttacksCancelKey = key;
+                    StorageManager.saveFakeAttacksCancelKey(this.state.fakeAttacksCancelKey);
+                    this.componentManager.setFakeAttacksConfig(this.state.fakeAttacksEnabled, this.state.fakeAttacksCancelKey);
+                } catch (error) {
+                    alert(error.message);
+                    // Revert to previous value
+                    e.target.value = this.state.fakeAttacksCancelKey;
+                }
             }
         });
 
