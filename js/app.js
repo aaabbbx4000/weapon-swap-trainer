@@ -113,6 +113,28 @@ class TrainingApp {
             }
         });
 
+        // Capture mouse button for cancel key
+        this.ui.elements.cancelKeyInput.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            const buttonName = this.ui.getMouseButtonName(e);
+            try {
+                this.state.fakeAttacksCancelKey = buttonName;
+                StorageManager.saveFakeAttacksCancelKey(this.state.fakeAttacksCancelKey);
+                this.componentManager.setFakeAttacksConfig(this.state.fakeAttacksEnabled, this.state.fakeAttacksCancelKey);
+                e.target.value = buttonName;
+                e.target.blur();
+            } catch (error) {
+                alert(error.message);
+                // Revert to previous value
+                e.target.value = this.state.fakeAttacksCancelKey;
+            }
+        });
+
+        // Prevent context menu on cancel key input
+        this.ui.elements.cancelKeyInput.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
+
         // Focus/select on click for cancel key
         this.ui.elements.cancelKeyInput.addEventListener('click', (e) => {
             e.target.select();
@@ -121,6 +143,13 @@ class TrainingApp {
         // Keyboard events
         document.addEventListener('keydown', (e) => this.handleKeyDown(e));
         document.addEventListener('mousedown', (e) => this.handleMouseDown(e));
+
+        // Prevent context menu during training
+        document.addEventListener('contextmenu', (e) => {
+            if (this.state.isTraining) {
+                e.preventDefault();
+            }
+        });
     }
 
     /**
@@ -333,9 +362,9 @@ class TrainingApp {
         // Prevent default browser behavior during training (e.g., context menu)
         e.preventDefault();
 
-        if (e.button === 0) {
-            this.processKeyInput('LeftMouseButton');
-        }
+        // Use the same mouse button naming as keybindings
+        const buttonName = this.ui.getMouseButtonName(e);
+        this.processKeyInput(buttonName);
     }
 
     /**

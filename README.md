@@ -20,7 +20,7 @@ Easily configure your weapon loadout for slots 1-8.
 - **Personal Bests**: Track your best time for each weapon skill
 - **Statistics**: View average, fastest, and slowest times after each round
 - **Weapon Selection**: Configure which weapons are in slots 1-8
-- **Custom Keybindings**: Match your in-game weapon slot keybindings (e.g., F, R, V instead of 1, 2, 3)
+- **Custom Keybindings**: Match your in-game weapon slot keybindings - supports keyboard keys, special keys (Ctrl, Shift, Alt), and mouse buttons
 - **Auto-Skip Option**: Automatically advance to the next skill after a time limit
 - **Progress Tracking**: See your times during the round and track improvements
 - **Weapon Fake Attacks**: Practice cancellation mechanics for advanced PvP techniques
@@ -77,14 +77,18 @@ Many players use custom keybindings instead of the default 1-8 for weapon slots.
 #### How to Set Up
 1. Go to **Configure** → **Weapon Slots**
 2. For each slot, you'll see a small input box before the weapon dropdown
-3. Click the box and **press the key** you want to bind (it will be captured automatically)
-4. Supports all keys including special keys like **Ctrl**, **Shift**, **Alt**, **Space**, function keys, etc.
-5. The trainer will now show and accept your custom keys during training
+3. Click the box and **press the key or mouse button** you want to bind (it will be captured automatically)
+4. Supports all input types:
+   - **Keyboard keys**: Letters, numbers, function keys, etc.
+   - **Special keys**: Ctrl, Shift, Alt, Space, etc.
+   - **Mouse buttons**: Mouse1 (left), Mouse2 (right), Mouse3 (middle), Mouse4/5 (side buttons)
+5. The trainer will now show and accept your custom bindings during training
 
 #### Examples
 - Regular key: Bind slot 1 to "F" → displays "F" + "Q" for Greatsword Q
 - Special key: Bind slot 1 to "LeftCtrl" → displays "LeftCtrl" + "Q" for Greatsword Q
-- Works with any key your keyboard can press!
+- Mouse button: Bind slot 1 to "Mouse4" → displays "Mouse4" + "Q" for Greatsword Q
+- Works with any key or button you can press!
 
 ### Weapon Fake Attacks
 

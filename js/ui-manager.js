@@ -406,6 +406,20 @@ class UIManager {
                 }
             });
 
+            // Capture mouse button clicks
+            keyInput.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                const buttonName = this.getMouseButtonName(e);
+                keybindingChangeCallback(slot, buttonName);
+                keyInput.value = buttonName;
+                keyInput.blur(); // Remove focus after capturing
+            });
+
+            // Prevent context menu on right-click
+            keyInput.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+            });
+
             // Focus on click to make it clear it's interactive
             keyInput.addEventListener('click', (e) => {
                 e.target.select();
@@ -443,6 +457,21 @@ class UIManager {
         }
 
         return keyMap[event.key] || event.key;
+    }
+
+    /**
+     * Get mouse button name from mouse event
+     */
+    getMouseButtonName(event) {
+        const buttonNames = {
+            0: 'Mouse1',
+            1: 'Mouse3',  // Middle button
+            2: 'Mouse2',  // Right button
+            3: 'Mouse4',  // Back button
+            4: 'Mouse5'   // Forward button
+        };
+
+        return buttonNames[event.button] || `Mouse${event.button}`;
     }
 
     /**
