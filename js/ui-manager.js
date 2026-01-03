@@ -82,12 +82,16 @@ class UIManager {
      * Update weapon display
      */
     updateComponent(component, currentIndex, totalCount) {
-        // Show weapon name, hide combo preview
+        // Show weapon name, hide decision mode elements
         this.elements.weaponName.style.display = 'block';
         const comboPreview = document.getElementById('comboPreview');
+        const comboRequirement = document.getElementById('comboRequirement');
 
         if (comboPreview) {
             comboPreview.style.display = 'none';
+        }
+        if (comboRequirement) {
+            comboRequirement.style.display = 'none';
         }
 
         // Update weapon name - add "Fake Attack" in yellow if it's a fake
