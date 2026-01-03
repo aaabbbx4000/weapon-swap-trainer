@@ -508,6 +508,12 @@ class TrainingApp {
             return;
         }
 
+        // Get the specific combo currently being practiced
+        const targetCombo = validCombos[this.state.currentComboIndex];
+        if (!targetCombo) {
+            return;
+        }
+
         const weaponSlots = this.componentManager.getWeaponSlots();
         const slotKeybindings = this.componentManager.getSlotKeybindings();
 
@@ -551,11 +557,9 @@ class TrainingApp {
                 // Set the skill for the current weapon
                 this.state.currentCombo.weapons[this.state.currentCombo.weapons.length - 1].skill = skill;
 
-                // Check if this weapon+skill combination is valid (exists in at least one combo)
+                // Check if this weapon+skill matches the target combo's first part
                 const currentWeapon = this.state.currentCombo.weapons[0].weapon;
-                const isValidStart = validCombos.some(combo =>
-                    combo.weapon1 === currentWeapon && combo.skill1 === skill
-                );
+                const isValidStart = targetCombo.weapon1 === currentWeapon && targetCombo.skill1 === skill;
 
                 const comboWeapon1Container = document.getElementById('comboWeapon1').parentElement;
                 const comboWeapon1Img = document.getElementById('comboWeapon1');
@@ -600,14 +604,13 @@ class TrainingApp {
             const skill = inputKey.toUpperCase();
 
             if (skill === 'Q' || skill === 'E') {
-                // Check if this is a valid same-weapon combo
+                // Check if this is the target same-weapon combo
                 const firstWeapon = this.state.currentCombo.weapons[0];
-                const isValidSameWeapon = validCombos.some(combo =>
-                    combo.weapon1 === firstWeapon.weapon &&
-                    combo.skill1 === firstWeapon.skill &&
-                    combo.weapon2 === firstWeapon.weapon &&
-                    combo.skill2 === skill
-                );
+                const isValidSameWeapon =
+                    targetCombo.weapon1 === firstWeapon.weapon &&
+                    targetCombo.skill1 === firstWeapon.skill &&
+                    targetCombo.weapon2 === firstWeapon.weapon &&
+                    targetCombo.skill2 === skill;
 
                 if (isValidSameWeapon) {
                     // Valid same-weapon combo - add second weapon entry with same weapon
@@ -710,12 +713,11 @@ class TrainingApp {
                 comboWeapon2Container.style.borderWidth = '3px';
                 comboWeapon2Container.style.boxShadow = '0 0 20px rgba(0, 255, 136, 0.6)';
 
-                // Check if this full combo matches any configured combo
+                // Check if this full combo matches the target combo
                 const [first, second] = this.state.currentCombo.weapons;
-                const isValid = validCombos.some(combo => {
-                    return first.weapon === combo.weapon1 && first.skill === combo.skill1 &&
-                           second.weapon === combo.weapon2 && second.skill === combo.skill2;
-                });
+                const isValid =
+                    first.weapon === targetCombo.weapon1 && first.skill === targetCombo.skill1 &&
+                    second.weapon === targetCombo.weapon2 && second.skill === targetCombo.skill2;
 
                 const comboWeapon1Container = document.getElementById('comboWeapon1').parentElement;
                 const comboWeapon1Img = document.getElementById('comboWeapon1');
