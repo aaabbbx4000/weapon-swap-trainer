@@ -69,9 +69,27 @@
                 <div class="weapon-display">
                     <div id="weaponName" class="weapon-name">Weapon</div>
                     <div id="keyIndicators"></div>
+
+                    <!-- Combo requirement display for decision mode -->
+                    <div id="comboRequirement" class="combo-requirement" style="display: none;">
+                        Perform: <span id="comboRequirementText"></span>
+                    </div>
+
+                    <!-- Combo preview for decision mode -->
+                    <div id="comboPreview" class="combo-preview">
+                        <div class="combo-weapon-container">
+                            <img id="comboWeapon1" src="" alt="" class="combo-weapon-img">
+                        </div>
+                        <div id="comboArrow" class="combo-arrow">→</div>
+                        <div id="comboWeapon2Container" class="combo-weapon-container">
+                            <img id="comboWeapon2" src="" alt="" class="combo-weapon-img">
+                        </div>
+                    </div>
+
                     <div style="position: relative; display: inline-block;">
                         <img id="weaponImage" class="weapon-image" src="" alt="Weapon">
                         <div id="fakeOverlay" style="display: none; position: absolute; top: 15%; left: 50%; transform: translateX(-50%); color: red; font-size: 48px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8); pointer-events: none; z-index: 10;">FAKE</div>
+                        <div id="skillOverlay" style="display: none; position: absolute; top: 5%; left: 5%; color: #ff0000; font-size: 72px; font-weight: bold; text-shadow: 4px 4px 8px rgba(0,0,0,1), -2px -2px 4px rgba(0,0,0,1), 0 0 20px rgba(255,0,0,0.8); pointer-events: none; z-index: 10;"></div>
                     </div>
                 </div>
                 <div class="training-footer">
@@ -109,7 +127,7 @@
         </div>
     </div>
 
-    <!-- Times Sidebar -->
+    <!-- Times Sidebar (Classic Mode) -->
     <div id="timesSidebar" style="display: none;">
         <h3>Times</h3>
         <div id="timesList"></div>
@@ -133,8 +151,32 @@
             <button class="modal-close-x" id="closeConfigBtnX">&times;</button>
             <div class="modal-header">Configure Weapons</div>
 
-            <!-- Weapon Slots Configuration -->
+            <!-- Training Mode Selection -->
             <div class="config-section">
+                <h3>Training Mode</h3>
+                <div class="training-mode-select">
+                    <label>
+                        <input type="radio" name="trainingMode" value="classic" id="classicModeRadio" checked>
+                        <span>Classic Mode</span> - Practice weapon swaps and skill execution
+                    </label>
+                    <label>
+                        <input type="radio" name="trainingMode" value="decision" id="decisionModeRadio">
+                        <span>Decision Mode</span> - Make tactical decisions based on distance
+                    </label>
+                </div>
+            </div>
+
+            <!-- Decision Mode Configuration (shown only when Decision Mode is selected) -->
+            <div id="decisionModeConfig" class="config-section" style="display: none;">
+                <h3>Decision Mode Configuration</h3>
+                <p style="margin-bottom: 15px; color: #aaa; font-size: 14px;">
+                    Configure up to 3 valid combos per distance. During training, execute any weapon combo ending with one of your configured weapon+skill finishers.
+                </p>
+                <div id="decisionConfigList"></div>
+            </div>
+
+            <!-- Weapon Slots Configuration -->
+            <div class="config-section" id="weaponSlotsSection">
                 <h3>Weapon Slots (1-8)</h3>
                 <div id="weaponSlotsList"></div>
             </div>
@@ -143,33 +185,43 @@
             <div class="auto-skip-settings">
                 <h3>Options</h3>
 
-                <!-- Auto-Skip -->
-                <div class="auto-skip-checkbox">
-                    <input type="checkbox" id="autoAdvanceCheckbox">
-                    <label for="autoAdvanceCheckbox">
-                        Auto-skip to next skill after time limit
-                    </label>
-                </div>
-                <div class="auto-skip-delay">
-                    <label for="autoAdvanceDelayInput">Time limit (seconds):</label>
-                    <input type="number" id="autoAdvanceDelayInput"
-                           min="0.1" max="10" step="0.1" value="3.0">
-                </div>
-
-                <!-- Weapon Fake Attacks -->
-                <div class="fake-attacks-section" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #444;">
+                <!-- Classic Mode Options -->
+                <div id="classicModeOptions">
+                    <!-- Auto-Skip -->
                     <div class="auto-skip-checkbox">
-                        <input type="checkbox" id="fakeAttacksCheckbox">
-                        <label for="fakeAttacksCheckbox">
-                            Enable weapon fake attacks (Greatsword Q, Sword E, Axe E)
+                        <input type="checkbox" id="autoAdvanceCheckbox">
+                        <label for="autoAdvanceCheckbox">
+                            Auto-skip to next skill after time limit
                         </label>
                     </div>
-                    <div class="fake-attacks-config" style="margin-left: 25px; margin-top: 10px;">
-                        <div class="fake-attack-setting" style="margin-bottom: 10px;">
-                            <label for="cancelKeyInput">Cancellation key:</label>
-                            <input type="text" id="cancelKeyInput" readonly placeholder="Press key" style="width: 100px; text-align: center; cursor: pointer;" value="x">
+                    <div class="auto-skip-delay">
+                        <label for="autoAdvanceDelayInput">Time limit (seconds):</label>
+                        <input type="number" id="autoAdvanceDelayInput"
+                               min="0.1" max="10" step="0.1" value="3.0">
+                    </div>
+
+                    <!-- Weapon Fake Attacks -->
+                    <div class="fake-attacks-section" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #444;">
+                        <div class="auto-skip-checkbox">
+                            <input type="checkbox" id="fakeAttacksCheckbox">
+                            <label for="fakeAttacksCheckbox">
+                                Enable weapon fake attacks (Greatsword Q, Sword E, Axe E)
+                            </label>
+                        </div>
+                        <div class="fake-attacks-config" style="margin-left: 25px; margin-top: 10px;">
+                            <div class="fake-attack-setting" style="margin-bottom: 10px;">
+                                <label for="cancelKeyInput">Cancellation key:</label>
+                                <input type="text" id="cancelKeyInput" readonly placeholder="Press key" style="width: 100px; text-align: center; cursor: pointer;" value="x">
+                            </div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Decision Mode Options -->
+                <div id="decisionModeOptions" style="display: none;">
+                    <p style="color: #aaa; font-size: 14px;">
+                        In Decision Mode, you must complete all configured combos for each distance before advancing.
+                    </p>
                 </div>
             </div>
         </div>

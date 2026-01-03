@@ -82,6 +82,18 @@ class UIManager {
      * Update weapon display
      */
     updateComponent(component, currentIndex, totalCount) {
+        // Show weapon name, hide skill overlay and combo preview
+        this.elements.weaponName.style.display = 'block';
+        const skillOverlay = document.getElementById('skillOverlay');
+        const comboPreview = document.getElementById('comboPreview');
+
+        if (skillOverlay) {
+            skillOverlay.style.display = 'none';
+        }
+        if (comboPreview) {
+            comboPreview.style.display = 'none';
+        }
+
         // Update weapon name - add "Fake Attack" in yellow if it's a fake
         if (component.isFake) {
             this.elements.weaponName.innerHTML = `${component.weapon} <span style="color: #ffd700;">Fake Attack</span>`;
@@ -351,11 +363,22 @@ class UIManager {
         this.elements.pbListContent.innerHTML = '';
 
         sortedPBs.forEach(([key, time]) => {
-            const component = componentManager.findByKey(key);
+            // Check if it's a decision mode key
+            let description;
+            if (key.startsWith('decision-')) {
+                const parts = key.split('-');
+                const distance = parts[1];
+                const skill = parts[2];
+                description = `${distance.charAt(0).toUpperCase() + distance.slice(1)} ${skill}`;
+            } else {
+                const component = componentManager.findByKey(key);
+                description = component ? component.description : key;
+            }
+
             const item = document.createElement('div');
             item.className = 'pb-item';
             item.innerHTML = `
-                <span>${component ? component.description : key}</span>
+                <span>${description}</span>
                 <span class="pb-time">${time.toFixed(1)}s</span>
             `;
             this.elements.pbListContent.appendChild(item);
@@ -511,5 +534,146 @@ class UIManager {
     setFakeAttacksSettings(enabled, cancelKey) {
         this.elements.fakeAttacksCheckbox.checked = enabled;
         this.elements.cancelKeyInput.value = cancelKey;
+    }
+
+    /**
+     * Render decision mode configuration UI
+     */
+    renderDecisionModeConfig(decisionConfig, configuredWeapons, onComboAdd, onComboRemove) {
+        const container = document.getElementById('decisionConfigList');
+        container.innerHTML = '';
+
+        DISTANCES.forEach(distance => {
+            const item = document.createElement('div');
+            item.className = 'decision-config-item';
+            item.style.cssText = 'margin-bottom: 20px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 5px;';
+
+            const distanceLabel = distance.charAt(0).toUpperCase() + distance.slice(1);
+            const combos = decisionConfig[distance] || [];
+
+            // Build combos list HTML
+            let combosListHTML = '';
+            combos.forEach((combo, index) => {
+                combosListHTML += `
+                    <div style="display: flex; align-items: center; gap: 10px; padding: 8px; background: rgba(0,0,0,0.2); border-radius: 3px; margin-bottom: 5px;">
+                        <span style="flex: 1; color: #ffaa77; font-weight: 500;">${combo.weapon1} ${combo.skill1} → ${combo.weapon2} ${combo.skill2}</span>
+                        <button class="remove-combo-btn" data-distance="${distance}" data-index="${index}" style="padding: 4px 12px; background: #ff4444; border: none; border-radius: 3px; color: white; cursor: pointer; font-size: 0.9em;">Remove</button>
+                    </div>
+                `;
+            });
+
+            item.innerHTML = `
+                <div style="font-weight: bold; margin-bottom: 10px; color: #fff;">${distanceLabel} Range</div>
+
+                <!-- Existing combos -->
+                <div style="margin-bottom: 15px;">
+                    ${combos.length > 0 ? combosListHTML : '<div style="color: #888; font-style: italic;">No combos configured</div>'}
+                </div>
+
+                <!-- Add new combo -->
+                <div style="display: grid; grid-template-columns: 1fr 0.7fr 1fr 0.7fr auto; gap: 10px; align-items: flex-end;">
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; color: #aaa; font-size: 0.9em;">Weapon 1:</label>
+                        <select class="weapon-select new-combo-weapon1" data-distance="${distance}" style="width: 100%;">
+                            <option value="">-- Select --</option>
+                            ${configuredWeapons.map(weapon => `<option value="${weapon}">${weapon}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; color: #aaa; font-size: 0.9em;">Skill 1:</label>
+                        <select class="weapon-select new-combo-skill1" data-distance="${distance}" style="width: 100%;">
+                            <option value="">--</option>
+                            <option value="Q">Q</option>
+                            <option value="E">E</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; color: #aaa; font-size: 0.9em;">Weapon 2:</label>
+                        <select class="weapon-select new-combo-weapon2" data-distance="${distance}" style="width: 100%;">
+                            <option value="">-- Select --</option>
+                            ${configuredWeapons.map(weapon => `<option value="${weapon}">${weapon}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; color: #aaa; font-size: 0.9em;">Skill 2:</label>
+                        <select class="weapon-select new-combo-skill2" data-distance="${distance}" style="width: 100%;">
+                            <option value="">--</option>
+                            <option value="Q">Q</option>
+                            <option value="E">E</option>
+                        </select>
+                    </div>
+                    <button class="add-combo-btn" data-distance="${distance}" style="padding: 10px 20px; background: #00d9ff; border: none; border-radius: 5px; color: #000; cursor: pointer; font-weight: bold; white-space: nowrap;">Add Combo</button>
+                </div>
+            `;
+
+            // Add event listeners for remove buttons
+            const removeBtns = item.querySelectorAll('.remove-combo-btn');
+            removeBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const distance = e.target.dataset.distance;
+                    const index = parseInt(e.target.dataset.index);
+                    onComboRemove(distance, index);
+                });
+            });
+
+            // Add event listener for add button
+            const addBtn = item.querySelector('.add-combo-btn');
+            addBtn.addEventListener('click', (e) => {
+                const distance = e.target.dataset.distance;
+                const weapon1Select = item.querySelector('.new-combo-weapon1');
+                const skill1Select = item.querySelector('.new-combo-skill1');
+                const weapon2Select = item.querySelector('.new-combo-weapon2');
+                const skill2Select = item.querySelector('.new-combo-skill2');
+
+                const weapon1 = weapon1Select.value;
+                const skill1 = skill1Select.value;
+                const weapon2 = weapon2Select.value;
+                const skill2 = skill2Select.value;
+
+                if (weapon1 && skill1 && weapon2 && skill2) {
+                    onComboAdd(distance, weapon1, skill1, weapon2, skill2);
+                    weapon1Select.value = '';
+                    skill1Select.value = '';
+                    weapon2Select.value = '';
+                    skill2Select.value = '';
+                } else {
+                    alert('Please select all fields (both weapons and skills)');
+                }
+            });
+
+            container.appendChild(item);
+        });
+    }
+
+    /**
+     * Update component display for decision mode
+     */
+    updateDecisionComponent(distance, currentIndex, totalCount) {
+        // Reset weapon name display (keep it visible but empty to reserve space)
+        this.elements.weaponName.textContent = '';
+        this.elements.weaponName.style.fontSize = '';
+        this.elements.weaponName.style.color = '';
+        this.elements.weaponName.style.textShadow = '';
+        this.elements.fakeOverlay.style.display = 'none';
+
+        // Show distance image
+        const imagePath = DISTANCE_IMAGES[distance];
+        this.elements.weaponImage.src = imagePath;
+        this.elements.weaponImage.className = 'weapon-image decision-image';
+
+        // Hide skill overlay - user decides what combo to do
+        const overlay = document.getElementById('skillOverlay');
+        if (overlay) {
+            overlay.style.display = 'none';
+        }
+
+        // Show combo preview container (empty placeholders)
+        const comboPreview = document.getElementById('comboPreview');
+        if (comboPreview) {
+            comboPreview.style.display = 'flex';
+        }
+
+        this.elements.roundProgress.textContent = `Decision ${currentIndex + 1} / ${totalCount}`;
+        this.elements.keyIndicators.innerHTML = '';
     }
 }

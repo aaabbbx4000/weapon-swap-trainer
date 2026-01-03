@@ -122,4 +122,68 @@ class StorageManager {
     static saveSlotKeybindings(slotKeybindings) {
         localStorage.setItem(CONFIG.STORAGE_KEYS.SLOT_KEYBINDINGS, JSON.stringify(slotKeybindings));
     }
+
+    /**
+     * Load training mode from localStorage
+     */
+    static loadTrainingMode() {
+        const saved = localStorage.getItem(CONFIG.STORAGE_KEYS.TRAINING_MODE);
+        return saved || CONFIG.TRAINING_MODES.CLASSIC;
+    }
+
+    /**
+     * Save training mode to localStorage
+     */
+    static saveTrainingMode(mode) {
+        localStorage.setItem(CONFIG.STORAGE_KEYS.TRAINING_MODE, mode);
+    }
+
+    /**
+     * Load decision mode configuration from localStorage
+     */
+    static loadDecisionModeConfig() {
+        const saved = localStorage.getItem(CONFIG.STORAGE_KEYS.DECISION_MODE_CONFIG);
+
+        if (!saved) {
+            return JSON.parse(JSON.stringify(DEFAULT_DECISION_CONFIG));
+        }
+
+        try {
+            const config = JSON.parse(saved);
+
+            // Migrate old format { distance: { Q: 'weapon', E: 'weapon' } }
+            // to new format { distance: [{ weapon: 'X', skill: 'Q' }, ...] }
+            const migratedConfig = {};
+
+            for (const distance of DISTANCES) {
+                if (Array.isArray(config[distance])) {
+                    // Check if it's the new full-combo format
+                    if (config[distance].length > 0 && config[distance][0].weapon1) {
+                        // New format - use as-is
+                        migratedConfig[distance] = config[distance];
+                    } else {
+                        // Old single-weapon format - can't migrate, reset
+                        migratedConfig[distance] = [];
+                    }
+                } else if (config[distance] && typeof config[distance] === 'object') {
+                    // Very old format - reset
+                    migratedConfig[distance] = [];
+                } else {
+                    migratedConfig[distance] = [];
+                }
+            }
+
+            return migratedConfig;
+        } catch (e) {
+            console.error('Error loading decision mode config:', e);
+            return JSON.parse(JSON.stringify(DEFAULT_DECISION_CONFIG));
+        }
+    }
+
+    /**
+     * Save decision mode configuration to localStorage
+     */
+    static saveDecisionModeConfig(config) {
+        localStorage.setItem(CONFIG.STORAGE_KEYS.DECISION_MODE_CONFIG, JSON.stringify(config));
+    }
 }

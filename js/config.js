@@ -36,7 +36,14 @@ const CONFIG = {
         WEAPON_SLOTS: 'weaponSlots',
         SLOT_KEYBINDINGS: 'slotKeybindings',
         FAKE_ATTACKS_ENABLED: 'fakeAttacksEnabled',
-        FAKE_ATTACKS_CANCEL_KEY: 'fakeAttacksCancelKey'
+        FAKE_ATTACKS_CANCEL_KEY: 'fakeAttacksCancelKey',
+        TRAINING_MODE: 'trainingMode',
+        DECISION_MODE_CONFIG: 'decisionModeConfig'
+    },
+
+    TRAINING_MODES: {
+        CLASSIC: 'classic',
+        DECISION: 'decision'
     }
 };
 
@@ -101,6 +108,24 @@ const WEAPON_SKILL_IMAGES = {
     'Reaper-e': 'images/weapon skills/reaper e.png'
 };
 
+// Weapon images mapping (weapon name -> image path)
+const WEAPON_IMAGES = {
+    'Spear': 'images/weapons/Weapon_SanguineSpear.webp',
+    'Slasher': 'images/weapons/Weapon_SanguineSlashers.webp',
+    'Axe': 'images/weapons/Weapon_SanguineAxes.webp',
+    'Mace': 'images/weapons/Weapon_SanguineMace.webp',
+    'Sword': 'images/weapons/Weapon_SanguineSword.webp',
+    'Crossbow': 'images/weapons/Weapon_SanguineCrossbow.webp',
+    'Greatsword': 'images/weapons/Weapon_SanguineGreatsword.webp',
+    'Whip': 'images/weapons/Weapon_SanguineWhip.webp',
+    'LongBow': 'images/weapons/Weapon_SanguineLongbow.webp',
+    'Dagger': 'images/weapons/Weapon_SanguineDaggers.webp',
+    'Claw': 'images/weapons/Weapon_SanguineClaws.webp',
+    'TwinBlade': 'images/weapons/Weapon_SanguineTwinblade.webp',
+    'Pistols': 'images/weapons/Weapon_SanguinePistols.webp',
+    'Reaper': 'images/weapons/Weapon_SanguineReaper.webp'
+};
+
 const DEFAULT_WEAPON_SLOTS = {
     1: 'LongBow',
     2: 'Reaper',
@@ -130,3 +155,37 @@ const FAKE_ATTACK_SKILLS = [
     { weapon: 'Sword', skill: 'E' },
     { weapon: 'Axe', skill: 'E' }
 ];
+
+// Distance images for decision mode
+const DISTANCE_IMAGES = {
+    'close': 'images/best in slot/close.png',
+    'medium': 'images/best in slot/medium.png',
+    'far': 'images/best in slot/far.png'
+};
+
+const DISTANCES = ['close', 'medium', 'far'];
+const DECISION_SKILLS = ['Q', 'E'];
+
+// Default decision mode configuration
+// Each distance has an array of combos (weapon + skill pairs)
+// Format: [{ weapon1: 'WeaponName', skill1: 'Q', weapon2: 'WeaponName', skill2: 'E' }, ...]
+const DEFAULT_DECISION_CONFIG = {
+    close: [
+        { weapon1: 'Slasher', skill1: 'E', weapon2: 'Spear', skill2: 'Q' },
+        { weapon1: 'Slasher', skill1: 'E', weapon2: 'Reaper', skill2: 'Q' },
+        { weapon1: 'Greatsword', skill1: 'E', weapon2: 'Reaper', skill2: 'Q' }
+    ],
+    medium: [
+        { weapon1: 'Axe', skill1: 'E', weapon2: 'Greatsword', skill2: 'Q' },
+        { weapon1: 'Axe', skill1: 'E', weapon2: 'Axe', skill2: 'Q' },
+        { weapon1: 'Axe', skill1: 'E', weapon2: 'LongBow', skill2: 'Q' },
+        { weapon1: 'Slasher', skill1: 'E', weapon2: 'Spear', skill2: 'Q' },
+        { weapon1: 'Slasher', skill1: 'E', weapon2: 'Reaper', skill2: 'Q' },
+        { weapon1: 'Greatsword', skill1: 'Q', weapon2: 'Greatsword', skill2: 'E' }
+    ],
+    far: [
+        { weapon1: 'Sword', skill1: 'E', weapon2: 'Reaper', skill2: 'Q' },
+        { weapon1: 'Sword', skill1: 'E', weapon2: 'Sword', skill2: 'Q' },
+        { weapon1: 'Greatsword', skill1: 'Q', weapon2: 'Greatsword', skill2: 'E' }
+    ]
+};
