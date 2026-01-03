@@ -113,8 +113,14 @@ class TrainingApp {
             }
         });
 
-        // Capture mouse button for cancel key
+        // Capture mouse button for cancel key (but not the initial click to focus)
         this.ui.elements.cancelKeyInput.addEventListener('mousedown', (e) => {
+            if (!document.activeElement || document.activeElement !== this.ui.elements.cancelKeyInput) {
+                // This is the initial click to focus - allow it
+                return;
+            }
+
+            // Input is already focused - capture this as a binding
             e.preventDefault();
             const buttonName = this.ui.getMouseButtonName(e);
             try {
@@ -133,11 +139,6 @@ class TrainingApp {
         // Prevent context menu on cancel key input
         this.ui.elements.cancelKeyInput.addEventListener('contextmenu', (e) => {
             e.preventDefault();
-        });
-
-        // Focus/select on click for cancel key
-        this.ui.elements.cancelKeyInput.addEventListener('click', (e) => {
-            e.target.select();
         });
 
         // Keyboard events

@@ -380,9 +380,9 @@ class UIManager {
                 <input type="text" class="slot-key-input" data-slot="${slot}"
                        value="${currentKey}" readonly
                        placeholder="Press key"
-                       style="width: 60px; text-align: center; margin-right: 8px; cursor: pointer;">
-                <select class="weapon-select" data-slot="${slot}">
-                    <option value="">-- Select Weapon --</option>
+                       style="width: 100px; text-align: center; margin-right: 8px; cursor: pointer;">
+                <select class="weapon-select" data-slot="${slot}" style="width: 140px;">
+                    <option value="">-- Select --</option>
                     ${WEAPONS.map(weapon =>
                         `<option value="${weapon}" ${currentWeapon === weapon ? 'selected' : ''}>${weapon}</option>`
                     ).join('')}
@@ -395,6 +395,7 @@ class UIManager {
             });
 
             const keyInput = item.querySelector('.slot-key-input');
+            let isInitialClick = true;
 
             // Capture actual key press instead of typed input
             keyInput.addEventListener('keydown', (e) => {
@@ -406,23 +407,31 @@ class UIManager {
                 }
             });
 
-            // Capture mouse button clicks
+            // Capture mouse button clicks (but not the initial click to focus)
             keyInput.addEventListener('mousedown', (e) => {
+                if (!document.activeElement || document.activeElement !== keyInput) {
+                    // This is the initial click to focus - allow it
+                    isInitialClick = true;
+                    return;
+                }
+
+                // Input is already focused - capture this as a binding
                 e.preventDefault();
                 const buttonName = this.getMouseButtonName(e);
                 keybindingChangeCallback(slot, buttonName);
                 keyInput.value = buttonName;
                 keyInput.blur(); // Remove focus after capturing
+                isInitialClick = true; // Reset for next time
+            });
+
+            // Reset isInitialClick when input gets focus
+            keyInput.addEventListener('focus', () => {
+                isInitialClick = false;
             });
 
             // Prevent context menu on right-click
             keyInput.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
-            });
-
-            // Focus on click to make it clear it's interactive
-            keyInput.addEventListener('click', (e) => {
-                e.target.select();
             });
 
             this.elements.weaponSlotsList.appendChild(item);
