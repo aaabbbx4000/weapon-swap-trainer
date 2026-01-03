@@ -667,7 +667,9 @@ class UIManager {
             comboPreview.style.display = 'flex';
         }
 
-        this.elements.roundProgress.textContent = `Decision ${currentIndex + 1} / ${totalCount}`;
+        // Show distance name instead of "Decision X / Y"
+        const distanceName = distance.charAt(0).toUpperCase() + distance.slice(1);
+        this.elements.roundProgress.textContent = distanceName;
         this.elements.keyIndicators.innerHTML = '';
     }
 }

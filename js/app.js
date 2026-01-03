@@ -180,19 +180,23 @@ class TrainingApp {
      */
     startRound() {
         try {
-            this.state.roundSize = this.ui.getRoundSize();
-
-            if (this.state.roundSize < CONFIG.ROUND_SIZE.MIN || this.state.roundSize > CONFIG.ROUND_SIZE.MAX) {
-                alert(`Round size must be between ${CONFIG.ROUND_SIZE.MIN} and ${CONFIG.ROUND_SIZE.MAX}`);
-                return;
-            }
-
-            StorageManager.saveRoundSize(this.state.roundSize);
-
             // Generate round based on mode
             if (this.state.trainingMode === CONFIG.TRAINING_MODES.DECISION) {
-                this.state.currentRound = this.generateDecisionRound(this.state.roundSize);
+                this.state.currentRound = this.generateDecisionRound();
+
+                if (this.state.currentRound.length === 0) {
+                    alert('Please configure combos for at least one distance in the Decision Mode Configuration.');
+                    return;
+                }
             } else {
+                this.state.roundSize = this.ui.getRoundSize();
+
+                if (this.state.roundSize < CONFIG.ROUND_SIZE.MIN || this.state.roundSize > CONFIG.ROUND_SIZE.MAX) {
+                    alert(`Round size must be between ${CONFIG.ROUND_SIZE.MIN} and ${CONFIG.ROUND_SIZE.MAX}`);
+                    return;
+                }
+
+                StorageManager.saveRoundSize(this.state.roundSize);
                 this.state.currentRound = this.componentManager.generateRound(this.state.roundSize);
             }
 
@@ -211,20 +215,22 @@ class TrainingApp {
     }
 
     /**
-     * Generate decision mode round
+     * Generate decision mode round - one distance per configured combo set
      */
-    generateDecisionRound(size) {
+    generateDecisionRound() {
         const round = [];
 
-        for (let i = 0; i < size; i++) {
-            const distance = DISTANCES[Math.floor(Math.random() * DISTANCES.length)];
-
-            round.push({
-                distance: distance,
-                key: `decision-${distance}`,
-                description: `${distance.charAt(0).toUpperCase() + distance.slice(1)}`,
-                isDecisionMode: true
-            });
+        // Create one entry for each distance that has configured combos
+        for (const distance of DISTANCES) {
+            const combos = this.state.decisionModeConfig[distance];
+            if (combos && combos.length > 0) {
+                round.push({
+                    distance: distance,
+                    key: `decision-${distance}`,
+                    description: `${distance.charAt(0).toUpperCase() + distance.slice(1)}`,
+                    isDecisionMode: true
+                });
+            }
         }
 
         return round;
@@ -269,13 +275,13 @@ class TrainingApp {
             this.ui.updateDecisionComponent(
                 component.distance,
                 this.state.currentComponentIndex,
-                this.state.roundSize
+                this.state.currentRound.length
             );
         } else {
             this.ui.updateComponent(
                 component,
                 this.state.currentComponentIndex,
-                this.state.roundSize
+                this.state.currentRound.length
             );
         }
 
@@ -782,9 +788,10 @@ class TrainingApp {
             comboRequirementText.textContent = comboText;
             comboRequirement.style.display = 'block';
 
-            // Update progress to show combo number
+            // Update progress to show distance and combo number
             const component = this.state.currentRound[this.state.currentComponentIndex];
-            this.ui.elements.roundProgress.textContent = `Decision ${this.state.currentComponentIndex + 1} / ${this.state.roundSize} - Combo ${this.state.currentComboIndex + 1} / ${combos.length}`;
+            const distanceName = distance.charAt(0).toUpperCase() + distance.slice(1);
+            this.ui.elements.roundProgress.textContent = `${distanceName} - Combo ${this.state.currentComboIndex + 1} / ${combos.length}`;
         }
     }
 
@@ -951,17 +958,20 @@ class TrainingApp {
         const weaponSlotsSection = document.getElementById('weaponSlotsSection');
         const classicModeOptions = document.getElementById('classicModeOptions');
         const decisionModeOptions = document.getElementById('decisionModeOptions');
+        const roundSizeControl = document.querySelector('.round-size-control-inline');
 
         if (this.state.trainingMode === CONFIG.TRAINING_MODES.DECISION) {
             decisionConfigSection.style.display = 'block';
             weaponSlotsSection.style.display = 'none';
             classicModeOptions.style.display = 'none';
             decisionModeOptions.style.display = 'block';
+            if (roundSizeControl) roundSizeControl.style.display = 'none';
         } else {
             decisionConfigSection.style.display = 'none';
             weaponSlotsSection.style.display = 'block';
             classicModeOptions.style.display = 'block';
             decisionModeOptions.style.display = 'none';
+            if (roundSizeControl) roundSizeControl.style.display = 'flex';
         }
     }
 
