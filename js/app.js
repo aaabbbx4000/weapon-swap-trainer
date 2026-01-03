@@ -314,6 +314,9 @@ class TrainingApp {
 
         if (!this.state.isTraining) return;
 
+        // Prevent default browser behavior for all keys during training
+        e.preventDefault();
+
         // Use the same key naming as keybindings
         const key = this.ui.getKeyName(e);
         if (key) {
@@ -326,6 +329,9 @@ class TrainingApp {
      */
     handleMouseDown(e) {
         if (!this.state.isTraining) return;
+
+        // Prevent default browser behavior during training (e.g., context menu)
+        e.preventDefault();
 
         if (e.button === 0) {
             this.processKeyInput('LeftMouseButton');
