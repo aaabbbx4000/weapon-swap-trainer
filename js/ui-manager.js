@@ -378,8 +378,9 @@ class UIManager {
             item.innerHTML = `
                 <label class="weapon-slot-label">Slot ${slot}:</label>
                 <input type="text" class="slot-key-input" data-slot="${slot}"
-                       maxlength="1" value="${currentKey}"
-                       style="width: 40px; text-align: center; margin-right: 8px;">
+                       value="${currentKey}" readonly
+                       placeholder="Press key"
+                       style="width: 60px; text-align: center; margin-right: 8px; cursor: pointer;">
                 <select class="weapon-select" data-slot="${slot}">
                     <option value="">-- Select Weapon --</option>
                     ${WEAPONS.map(weapon =>
@@ -394,12 +395,54 @@ class UIManager {
             });
 
             const keyInput = item.querySelector('.slot-key-input');
-            keyInput.addEventListener('input', (e) => {
-                keybindingChangeCallback(slot, e.target.value);
+
+            // Capture actual key press instead of typed input
+            keyInput.addEventListener('keydown', (e) => {
+                e.preventDefault();
+                const key = this.getKeyName(e);
+                if (key) {
+                    keybindingChangeCallback(slot, key);
+                    keyInput.value = key;
+                }
+            });
+
+            // Focus on click to make it clear it's interactive
+            keyInput.addEventListener('click', (e) => {
+                e.target.select();
             });
 
             this.elements.weaponSlotsList.appendChild(item);
         }
+    }
+
+    /**
+     * Get normalized key name from keyboard event
+     */
+    getKeyName(event) {
+        // Ignore certain keys that shouldn't be bindable
+        const ignoredKeys = ['Tab', 'Escape', 'Enter', 'CapsLock', 'NumLock', 'ScrollLock'];
+        if (ignoredKeys.includes(event.key)) {
+            return null;
+        }
+
+        // Handle special key names
+        const keyMap = {
+            'Control': 'Ctrl',
+            'ControlLeft': 'LeftCtrl',
+            'ControlRight': 'RightCtrl',
+            'ShiftLeft': 'LeftShift',
+            'ShiftRight': 'RightShift',
+            'AltLeft': 'LeftAlt',
+            'AltRight': 'RightAlt',
+            ' ': 'Space'
+        };
+
+        // Check if we should use code for left/right distinction
+        if (event.code && (event.code.startsWith('Control') || event.code.startsWith('Shift') || event.code.startsWith('Alt'))) {
+            return keyMap[event.code] || event.code;
+        }
+
+        return keyMap[event.key] || event.key;
     }
 
     /**

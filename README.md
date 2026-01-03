@@ -77,11 +77,14 @@ Many players use custom keybindings instead of the default 1-8 for weapon slots.
 #### How to Set Up
 1. Go to **Configure** → **Weapon Slots**
 2. For each slot, you'll see a small input box before the weapon dropdown
-3. Click the box and type your custom key (e.g., change "1" to "F")
-4. The trainer will now show and accept your custom keys during training
+3. Click the box and **press the key** you want to bind (it will be captured automatically)
+4. Supports all keys including special keys like **Ctrl**, **Shift**, **Alt**, **Space**, function keys, etc.
+5. The trainer will now show and accept your custom keys during training
 
-#### Example
-If you bind slot 1 to "F" and select Greatsword, the trainer will display "F" + "Q" instead of "1" + "Q" when training Greatsword Q.
+#### Examples
+- Regular key: Bind slot 1 to "F" → displays "F" + "Q" for Greatsword Q
+- Special key: Bind slot 1 to "LeftCtrl" → displays "LeftCtrl" + "Q" for Greatsword Q
+- Works with any key your keyboard can press!
 
 ### Weapon Fake Attacks
 

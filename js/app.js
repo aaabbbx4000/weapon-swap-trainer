@@ -95,19 +95,27 @@ class TrainingApp {
             }
         });
 
-        this.ui.elements.cancelKeyInput.addEventListener('input', (e) => {
-            const key = e.target.value.toLowerCase();
-            if (key.length > 0) {
+        // Capture actual key press for cancel key
+        this.ui.elements.cancelKeyInput.addEventListener('keydown', (e) => {
+            e.preventDefault();
+            const key = this.ui.getKeyName(e);
+            if (key) {
                 try {
                     this.state.fakeAttacksCancelKey = key;
                     StorageManager.saveFakeAttacksCancelKey(this.state.fakeAttacksCancelKey);
                     this.componentManager.setFakeAttacksConfig(this.state.fakeAttacksEnabled, this.state.fakeAttacksCancelKey);
+                    e.target.value = key;
                 } catch (error) {
                     alert(error.message);
                     // Revert to previous value
                     e.target.value = this.state.fakeAttacksCancelKey;
                 }
             }
+        });
+
+        // Focus/select on click for cancel key
+        this.ui.elements.cancelKeyInput.addEventListener('click', (e) => {
+            e.target.select();
         });
 
         // Keyboard events
@@ -306,8 +314,11 @@ class TrainingApp {
 
         if (!this.state.isTraining) return;
 
-        const key = e.key === ' ' ? ' ' : e.key.toLowerCase();
-        this.processKeyInput(key);
+        // Use the same key naming as keybindings
+        const key = this.ui.getKeyName(e);
+        if (key) {
+            this.processKeyInput(key);
+        }
     }
 
     /**
