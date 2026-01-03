@@ -82,14 +82,10 @@ class UIManager {
      * Update weapon display
      */
     updateComponent(component, currentIndex, totalCount) {
-        // Show weapon name, hide skill overlay and combo preview
+        // Show weapon name, hide combo preview
         this.elements.weaponName.style.display = 'block';
-        const skillOverlay = document.getElementById('skillOverlay');
         const comboPreview = document.getElementById('comboPreview');
 
-        if (skillOverlay) {
-            skillOverlay.style.display = 'none';
-        }
         if (comboPreview) {
             comboPreview.style.display = 'none';
         }
@@ -660,12 +656,6 @@ class UIManager {
         const imagePath = DISTANCE_IMAGES[distance];
         this.elements.weaponImage.src = imagePath;
         this.elements.weaponImage.className = 'weapon-image decision-image';
-
-        // Hide skill overlay - user decides what combo to do
-        const overlay = document.getElementById('skillOverlay');
-        if (overlay) {
-            overlay.style.display = 'none';
-        }
 
         // Show combo preview container (empty placeholders)
         const comboPreview = document.getElementById('comboPreview');

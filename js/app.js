@@ -23,7 +23,8 @@ class TrainingApp {
             roundResults: [],
             isTraining: false,
             startTime: null,
-            currentComboIndex: 0  // Track which combo they're working on in decision mode
+            currentComboIndex: 0,  // Track which combo in the list they're working on (decision mode)
+            currentCombo: { weapons: [] }  // Track the actively built combo (decision mode)
         };
 
         this.timers = {
@@ -327,32 +328,9 @@ class TrainingApp {
 
         const component = this.state.currentRound[this.state.currentComponentIndex];
 
-        // For decision mode, use combo-specific key for PB tracking
-        if (component.isDecisionMode && this.state.currentCombo && this.state.currentCombo.weapons.length === 2) {
-            const combo = this.state.currentCombo.weapons;
-            const comboKey = `${combo[0].weapon} ${combo[0].skill} → ${combo[1].weapon} ${combo[1].skill}`;
-
-            // Update PB with combo-specific key
-            const isNewPB = this.statisticsManager.updatePersonalBest(comboKey, completionTime);
-
-            if (isNewPB) {
-                this.ui.showNewPB(completionTime);
-            }
-
-            this.state.roundResults.push({
-                component: comboKey,
-                time: completionTime,
-                isNewPB,
-                errors: this.state.componentErrors
-            });
-
-            this.ui.addTimeToSidebar(
-                { description: comboKey },
-                completionTime,
-                isNewPB,
-                this.state.currentComponentIndex
-            );
-        } else {
+        // Skip PB tracking for decision mode - it's about learning, not speed
+        if (!component.isDecisionMode) {
+            // Only track times and PBs for classic mode
             const isNewPB = this.statisticsManager.updatePersonalBest(component.key, completionTime);
 
             if (isNewPB) {
@@ -427,6 +405,15 @@ class TrainingApp {
      * Show results screen
      */
     showResults() {
+        // Decision mode doesn't track results, go straight to welcome
+        if (this.state.trainingMode === CONFIG.TRAINING_MODES.DECISION) {
+            this.ui.showScreen(SCREENS.WELCOME);
+            this.ui.toggleTrainingButtons(false);
+            this.ui.showTimesSidebar(false);
+            return;
+        }
+
+        // Classic mode shows results
         this.ui.showScreen(SCREENS.RESULTS);
         this.ui.toggleTrainingButtons(false);
         this.ui.showTimesSidebar(false);
@@ -517,11 +504,6 @@ class TrainingApp {
 
         const weaponSlots = this.componentManager.getWeaponSlots();
         const slotKeybindings = this.componentManager.getSlotKeybindings();
-
-        // Track the current combo being input
-        if (!this.state.currentCombo) {
-            this.state.currentCombo = { weapons: [] };
-        }
 
         if (this.state.currentKeyIndex === 0) {
             // First input - check if it's a weapon slot key
@@ -854,10 +836,6 @@ class TrainingApp {
      * Reset decision mode visual feedback
      */
     resetDecisionFeedback() {
-        this.ui.elements.weaponImage.classList.remove('decision-inner-correct');
-        this.ui.elements.weaponImage.classList.remove('decision-outer-correct');
-        this.ui.elements.weaponImage.classList.remove('decision-inner-incorrect');
-        this.ui.elements.weaponImage.classList.remove('decision-outer-incorrect');
         this.resetComboPreview();
 
         // Hide combo requirement
