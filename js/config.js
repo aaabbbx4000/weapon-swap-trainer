@@ -16,27 +16,31 @@ const CONFIG = {
         MAX: 9999
     },
 
-    AUTO_ADVANCE: {
-        DEFAULT_ENABLED: false,
-        DEFAULT_DELAY: 3.0,
-        MIN_DELAY: 0.1,
-        MAX_DELAY: 10
-    },
-
     FAKE_ATTACKS: {
         DEFAULT_ENABLED: false,
         DEFAULT_CANCEL_KEY: 'x'
     },
 
+    PRESSURE_MODE: {
+        DEFAULT_ENABLED: true,
+        DEFAULT_DRAIN_RATE: 4.0,      // Percentage points per second
+        MIN_DRAIN_RATE: 0.5,
+        MAX_DRAIN_RATE: 5.0,
+        SUCCESS_BOOST: 7.5,           // Percentage boost on success
+        ERROR_PENALTY: 25,            // Percentage penalty on error
+        WARNING_THRESHOLD: 30,
+        CRITICAL_THRESHOLD: 15
+    },
+
     STORAGE_KEYS: {
         PERSONAL_BESTS: 'componentPBs',
         ROUND_SIZE: 'roundSize',
-        AUTO_ADVANCE: 'autoAdvance',
-        AUTO_ADVANCE_DELAY: 'autoAdvanceDelay',
         WEAPON_SLOTS: 'weaponSlots',
         SLOT_KEYBINDINGS: 'slotKeybindings',
         FAKE_ATTACKS_ENABLED: 'fakeAttacksEnabled',
-        FAKE_ATTACKS_CANCEL_KEY: 'fakeAttacksCancelKey'
+        FAKE_ATTACKS_CANCEL_KEY: 'fakeAttacksCancelKey',
+        PRESSURE_MODE_ENABLED: 'pressureModeEnabled',
+        PRESSURE_DRAIN_RATE: 'pressureDrainRate'
     }
 };
 

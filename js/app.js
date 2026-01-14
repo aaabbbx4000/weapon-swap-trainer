@@ -10,10 +10,13 @@ class TrainingApp {
 
         this.state = {
             roundSize: StorageManager.loadRoundSize(),
-            autoAdvance: StorageManager.loadAutoAdvance(),
-            autoAdvanceDelay: StorageManager.loadAutoAdvanceDelay(),
             fakeAttacksEnabled: StorageManager.loadFakeAttacksEnabled(),
             fakeAttacksCancelKey: StorageManager.loadFakeAttacksCancelKey(),
+            pressureModeEnabled: StorageManager.loadPressureModeEnabled(),
+            pressureDrainRate: StorageManager.loadPressureDrainRate(),
+            pressureBar: 100,
+            isPressureWarning: false,
+            isPressureCritical: false,
             currentRound: [],
             currentComponentIndex: 0,
             currentKeyIndex: 0,
@@ -26,7 +29,7 @@ class TrainingApp {
         this.timers = {
             countdown: null,
             component: null,
-            autoAdvance: null
+            pressureDrain: null
         };
     }
 
@@ -37,10 +40,13 @@ class TrainingApp {
         await this.componentManager.init();
         this.componentManager.setFakeAttacksConfig(this.state.fakeAttacksEnabled, this.state.fakeAttacksCancelKey);
         this.ui.setRoundSize(this.state.roundSize);
-        this.ui.setAutoAdvanceSettings(this.state.autoAdvance, this.state.autoAdvanceDelay);
         this.ui.setFakeAttacksSettings(
             this.state.fakeAttacksEnabled,
             this.state.fakeAttacksCancelKey
+        );
+        this.ui.setPressureModeSettings(
+            this.state.pressureModeEnabled,
+            this.state.pressureDrainRate
         );
         this.setupEventListeners();
     }
@@ -72,14 +78,6 @@ class TrainingApp {
         // Settings inputs
         this.ui.elements.roundSizeInput.addEventListener('input', (e) => this.handleRoundSizeInput(e));
         this.ui.elements.roundSizeInput.addEventListener('blur', (e) => this.handleRoundSizeBlur(e));
-
-        this.ui.elements.autoAdvanceCheckbox.addEventListener('change', (e) => {
-            this.state.autoAdvance = e.target.checked;
-            StorageManager.saveAutoAdvance(this.state.autoAdvance);
-        });
-
-        this.ui.elements.autoAdvanceDelayInput.addEventListener('input', (e) => this.handleAutoDelayInput(e));
-        this.ui.elements.autoAdvanceDelayInput.addEventListener('blur', (e) => this.handleAutoDelayBlur(e));
 
         // Fake attacks settings
         this.ui.elements.fakeAttacksCheckbox.addEventListener('change', (e) => {
@@ -141,6 +139,23 @@ class TrainingApp {
             e.preventDefault();
         });
 
+        // Pressure mode settings
+        this.ui.elements.pressureModeCheckbox.addEventListener('change', (e) => {
+            this.state.pressureModeEnabled = e.target.checked;
+            StorageManager.savePressureModeEnabled(this.state.pressureModeEnabled);
+        });
+
+        this.ui.elements.pressureDrainRateInput.addEventListener('blur', (e) => {
+            let value = parseFloat(e.target.value);
+            if (isNaN(value)) {
+                value = CONFIG.PRESSURE_MODE.DEFAULT_DRAIN_RATE;
+            }
+            value = Math.max(CONFIG.PRESSURE_MODE.MIN_DRAIN_RATE, Math.min(CONFIG.PRESSURE_MODE.MAX_DRAIN_RATE, value));
+            e.target.value = value.toFixed(1);
+            this.state.pressureDrainRate = value;
+            StorageManager.savePressureDrainRate(value);
+        });
+
         // Keyboard events
         document.addEventListener('keydown', (e) => this.handleKeyDown(e));
         document.addEventListener('mousedown', (e) => this.handleMouseDown(e));
@@ -170,6 +185,14 @@ class TrainingApp {
             this.state.currentRound = this.componentManager.generateRound(this.state.roundSize);
             this.state.currentComponentIndex = 0;
             this.state.roundResults = [];
+
+            // Initialize pressure mode if enabled
+            if (this.state.pressureModeEnabled) {
+                this.state.pressureBar = 100;
+                this.state.isPressureWarning = false;
+                this.state.isPressureCritical = false;
+                this.startPressureDrain();
+            }
 
             this.ui.showTimesSidebar(true);
             this.ui.showScreen(SCREENS.COUNTDOWN);
@@ -223,16 +246,15 @@ class TrainingApp {
         this.state.currentKeyIndex = 0;
         this.state.componentErrors = 0;
 
-        if (this.state.autoAdvance) {
-            this.timers.autoAdvance = setTimeout(() => {
-                this.skipToNextComponent();
-            }, this.state.autoAdvanceDelay * 1000);
-        }
-
         this.timers.component = setInterval(() => {
             const elapsed = (Date.now() - this.state.startTime) / 1000;
             this.ui.updateTimer(elapsed);
         }, CONFIG.TIMER_UPDATE_INTERVAL);
+
+        // Show pressure bar on first component
+        if (this.state.pressureModeEnabled && this.state.currentComponentIndex === 0) {
+            this.ui.showPressureBar();
+        }
     }
 
     /**
@@ -241,11 +263,15 @@ class TrainingApp {
     completeComponent() {
         if (!this.state.isTraining) return;
 
-        this.clearTimer('autoAdvance');
         this.clearTimer('component');
 
         const completionTime = (Date.now() - this.state.startTime) / 1000;
         this.state.isTraining = false;
+
+        // Reward success in pressure mode
+        if (this.state.pressureModeEnabled) {
+            this.boostPressureBar();
+        }
 
         const component = this.state.currentRound[this.state.currentComponentIndex];
         const isNewPB = this.statisticsManager.updatePersonalBest(component.key, completionTime);
@@ -278,35 +304,18 @@ class TrainingApp {
     }
 
     /**
-     * Skip to next component (auto-advance timeout)
-     */
-    skipToNextComponent() {
-        if (!this.state.isTraining) return;
-
-        this.clearTimer('component');
-        this.state.isTraining = false;
-
-        this.state.currentComponentIndex++;
-
-        if (this.state.currentComponentIndex < this.state.currentRound.length) {
-            setTimeout(() => this.startComponent(), CONFIG.SKIP_TRANSITION_DELAY);
-        } else {
-            setTimeout(() => this.showResults(), CONFIG.SKIP_TRANSITION_DELAY);
-        }
-    }
-
-    /**
      * Stop current round
      */
     stopRound() {
         this.clearTimer('countdown');
-        this.clearTimer('autoAdvance');
+        this.clearTimer('pressureDrain');
 
         if (this.state.isTraining) {
             this.clearTimer('component');
             this.state.isTraining = false;
         }
 
+        this.ui.hidePressureBar();
         this.ui.showTimesSidebar(false);
 
         if (this.state.roundResults.length > 0) {
@@ -327,6 +336,77 @@ class TrainingApp {
 
         const stats = this.statisticsManager.calculateRoundStats(this.state.roundResults);
         this.ui.showResults(this.state.roundResults, stats, this.state.roundSize);
+    }
+
+    /**
+     * Start pressure drain timer
+     */
+    startPressureDrain() {
+        const drainPerTick = this.state.pressureDrainRate / 20;
+
+        this.timers.pressureDrain = setInterval(() => {
+            this.state.pressureBar = Math.max(0, this.state.pressureBar - drainPerTick);
+            this.ui.updatePressureBar(this.state.pressureBar);
+
+            if (this.state.pressureBar <= CONFIG.PRESSURE_MODE.CRITICAL_THRESHOLD && !this.state.isPressureCritical) {
+                this.state.isPressureCritical = true;
+                this.ui.setPressureBarCritical();
+            } else if (this.state.pressureBar <= CONFIG.PRESSURE_MODE.WARNING_THRESHOLD && !this.state.isPressureWarning) {
+                this.state.isPressureWarning = true;
+                this.ui.setPressureBarWarning();
+            }
+
+            if (this.state.pressureBar <= 0) {
+                this.handlePressureGameOver();
+            }
+        }, 50);
+    }
+
+    /**
+     * Handle pressure mode game over
+     */
+    handlePressureGameOver() {
+        this.clearTimer('pressureDrain');
+        this.state.isTraining = false;
+        this.ui.showGameOverFlash();
+
+        setTimeout(() => {
+            this.showResults();
+        }, 1000);
+    }
+
+    /**
+     * Boost pressure bar on success
+     */
+    boostPressureBar() {
+        if (!this.state.pressureModeEnabled) return;
+
+        this.state.pressureBar = Math.min(100, this.state.pressureBar + CONFIG.PRESSURE_MODE.SUCCESS_BOOST);
+
+        if (this.state.pressureBar > CONFIG.PRESSURE_MODE.WARNING_THRESHOLD) {
+            this.state.isPressureWarning = false;
+            this.state.isPressureCritical = false;
+            this.ui.resetPressureBarState();
+        } else if (this.state.pressureBar > CONFIG.PRESSURE_MODE.CRITICAL_THRESHOLD) {
+            this.state.isPressureCritical = false;
+            this.ui.setPressureBarWarning();
+        }
+
+        this.ui.updatePressureBar(this.state.pressureBar);
+    }
+
+    /**
+     * Penalize pressure bar on error
+     */
+    penalizePressureBar() {
+        if (!this.state.pressureModeEnabled) return;
+
+        this.state.pressureBar = Math.max(0, this.state.pressureBar - CONFIG.PRESSURE_MODE.ERROR_PENALTY);
+        this.ui.updatePressureBar(this.state.pressureBar);
+
+        if (this.state.pressureBar <= 0) {
+            this.handlePressureGameOver();
+        }
     }
 
     /**
@@ -360,6 +440,16 @@ class TrainingApp {
     handleMouseDown(e) {
         if (!this.state.isTraining) return;
 
+        // Don't process clicks on UI buttons or interactive elements
+        const target = e.target;
+        if (target.tagName === 'BUTTON' ||
+            target.tagName === 'INPUT' ||
+            target.closest('button') ||
+            target.closest('.modal') ||
+            target.closest('.settings-button')) {
+            return; // Let the UI handle this click normally
+        }
+
         // Prevent default browser behavior during training (e.g., context menu)
         e.preventDefault();
 
@@ -381,11 +471,18 @@ class TrainingApp {
             this.ui.updateKeyIndicators(requiredKeys, this.state.currentKeyIndex);
             this.checkCompletion(requiredKeys);
         } else {
-            this.state.componentErrors++;
-            this.ui.flashKeyError(requiredKeys, () => {
-                this.state.currentKeyIndex = 0;
-                this.ui.updateKeyIndicators(requiredKeys, this.state.currentKeyIndex);
-            });
+            // Handle error
+            if (this.state.pressureModeEnabled) {
+                this.penalizePressureBar();
+                // Don't reset in pressure mode, let them continue
+                return;
+            } else {
+                this.state.componentErrors++;
+                this.ui.flashKeyError(requiredKeys, () => {
+                    this.state.currentKeyIndex = 0;
+                    this.ui.updateKeyIndicators(requiredKeys, this.state.currentKeyIndex);
+                });
+            }
         }
     }
 
@@ -516,47 +613,11 @@ class TrainingApp {
     }
 
     /**
-     * Handle auto-advance delay input
-     */
-    handleAutoDelayInput(e) {
-        const value = parseFloat(e.target.value);
-        if (!isNaN(value) && value >= CONFIG.AUTO_ADVANCE.MIN_DELAY && value <= CONFIG.AUTO_ADVANCE.MAX_DELAY) {
-            this.state.autoAdvanceDelay = value;
-            StorageManager.saveAutoAdvanceDelay(this.state.autoAdvanceDelay);
-        }
-    }
-
-    /**
-     * Handle auto-advance delay blur (validate)
-     */
-    handleAutoDelayBlur(e) {
-        let value = parseFloat(e.target.value);
-
-        if (isNaN(value) || e.target.value === '') {
-            e.target.value = this.state.autoAdvanceDelay;
-        } else if (value < CONFIG.AUTO_ADVANCE.MIN_DELAY) {
-            value = CONFIG.AUTO_ADVANCE.MIN_DELAY;
-            e.target.value = value;
-            this.state.autoAdvanceDelay = value;
-            StorageManager.saveAutoAdvanceDelay(value);
-        } else if (value > CONFIG.AUTO_ADVANCE.MAX_DELAY) {
-            value = CONFIG.AUTO_ADVANCE.MAX_DELAY;
-            e.target.value = value;
-            this.state.autoAdvanceDelay = value;
-            StorageManager.saveAutoAdvanceDelay(value);
-        }
-    }
-
-    /**
      * Clear a timer
      */
     clearTimer(timerName) {
         if (this.timers[timerName]) {
-            if (timerName === 'autoAdvance') {
-                clearTimeout(this.timers[timerName]);
-            } else {
-                clearInterval(this.timers[timerName]);
-            }
+            clearInterval(this.timers[timerName]);
             this.timers[timerName] = null;
         }
     }

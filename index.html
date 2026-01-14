@@ -78,6 +78,14 @@
                     <div class="timer" id="timer">0.0s</div>
                     <div class="pb-display" id="pbDisplay"></div>
                 </div>
+
+                <!-- Pressure Mode Display (at bottom) -->
+                <div id="pressureBarContainer" class="pressure-bar-container" style="display: none;">
+                    <div class="pressure-bar-bg">
+                        <div id="pressureBarFill" class="pressure-bar-fill"></div>
+                    </div>
+                    <div id="pressureBarText" class="pressure-bar-text">100%</div>
+                </div>
             </div>
 
             <!-- Results Screen -->
@@ -143,19 +151,6 @@
             <div class="auto-skip-settings">
                 <h3>Options</h3>
 
-                <!-- Auto-Skip -->
-                <div class="auto-skip-checkbox">
-                    <input type="checkbox" id="autoAdvanceCheckbox">
-                    <label for="autoAdvanceCheckbox">
-                        Auto-skip to next skill after time limit
-                    </label>
-                </div>
-                <div class="auto-skip-delay">
-                    <label for="autoAdvanceDelayInput">Time limit (seconds):</label>
-                    <input type="number" id="autoAdvanceDelayInput"
-                           min="0.1" max="10" step="0.1" value="3.0">
-                </div>
-
                 <!-- Weapon Fake Attacks -->
                 <div class="fake-attacks-section" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #444;">
                     <div class="auto-skip-checkbox">
@@ -168,6 +163,25 @@
                         <div class="fake-attack-setting" style="margin-bottom: 10px;">
                             <label for="cancelKeyInput">Cancellation key:</label>
                             <input type="text" id="cancelKeyInput" readonly placeholder="Press key" style="width: 100px; text-align: center; cursor: pointer;" value="x">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pressure Mode Settings -->
+                <div class="pressure-mode-section" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #444;">
+                    <div class="auto-skip-checkbox">
+                        <input type="checkbox" id="pressureModeCheckbox">
+                        <label for="pressureModeCheckbox">
+                            Enable Pressure Mode (Draining Bar)
+                        </label>
+                    </div>
+                    <div class="pressure-mode-config" style="margin-left: 25px; margin-top: 10px;">
+                        <div style="margin-bottom: 10px;">
+                            <label for="pressureDrainRateInput">Drain speed:</label>
+                            <input type="number" id="pressureDrainRateInput"
+                                   min="0.5" max="5.0" step="0.1" value="4.0"
+                                   style="width: 80px; text-align: center;">
+                            <span style="font-size: 12px; color: #888; margin-left: 5px;">%/sec</span>
                         </div>
                     </div>
                 </div>

@@ -34,36 +34,6 @@ class StorageManager {
     }
 
     /**
-     * Load auto-advance setting from localStorage
-     */
-    static loadAutoAdvance() {
-        const saved = localStorage.getItem(CONFIG.STORAGE_KEYS.AUTO_ADVANCE);
-        return saved === 'true';
-    }
-
-    /**
-     * Save auto-advance setting to localStorage
-     */
-    static saveAutoAdvance(enabled) {
-        localStorage.setItem(CONFIG.STORAGE_KEYS.AUTO_ADVANCE, enabled.toString());
-    }
-
-    /**
-     * Load auto-advance delay from localStorage
-     */
-    static loadAutoAdvanceDelay() {
-        const saved = localStorage.getItem(CONFIG.STORAGE_KEYS.AUTO_ADVANCE_DELAY);
-        return saved ? parseFloat(saved) : CONFIG.AUTO_ADVANCE.DEFAULT_DELAY;
-    }
-
-    /**
-     * Save auto-advance delay to localStorage
-     */
-    static saveAutoAdvanceDelay(delay) {
-        localStorage.setItem(CONFIG.STORAGE_KEYS.AUTO_ADVANCE_DELAY, delay.toString());
-    }
-
-    /**
      * Load weapon slots from localStorage
      */
     static loadWeaponSlots() {
@@ -106,6 +76,36 @@ class StorageManager {
      */
     static saveFakeAttacksCancelKey(key) {
         localStorage.setItem(CONFIG.STORAGE_KEYS.FAKE_ATTACKS_CANCEL_KEY, key);
+    }
+
+    /**
+     * Load pressure mode enabled setting from localStorage
+     */
+    static loadPressureModeEnabled() {
+        const saved = localStorage.getItem(CONFIG.STORAGE_KEYS.PRESSURE_MODE_ENABLED);
+        return saved === 'true';
+    }
+
+    /**
+     * Save pressure mode enabled setting to localStorage
+     */
+    static savePressureModeEnabled(enabled) {
+        localStorage.setItem(CONFIG.STORAGE_KEYS.PRESSURE_MODE_ENABLED, enabled.toString());
+    }
+
+    /**
+     * Load pressure mode drain rate from localStorage
+     */
+    static loadPressureDrainRate() {
+        const saved = localStorage.getItem(CONFIG.STORAGE_KEYS.PRESSURE_DRAIN_RATE);
+        return saved ? parseFloat(saved) : CONFIG.PRESSURE_MODE.DEFAULT_DRAIN_RATE;
+    }
+
+    /**
+     * Save pressure mode drain rate to localStorage
+     */
+    static savePressureDrainRate(rate) {
+        localStorage.setItem(CONFIG.STORAGE_KEYS.PRESSURE_DRAIN_RATE, rate.toString());
     }
 
     /**

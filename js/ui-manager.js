@@ -52,12 +52,17 @@ class UIManager {
 
             // Config
             roundSizeInput: document.getElementById('roundSizeInput'),
-            autoAdvanceCheckbox: document.getElementById('autoAdvanceCheckbox'),
-            autoAdvanceDelayInput: document.getElementById('autoAdvanceDelayInput'),
             weaponSlotsList: document.getElementById('weaponSlotsList'),
             pbListContent: document.getElementById('pbListContent'),
             fakeAttacksCheckbox: document.getElementById('fakeAttacksCheckbox'),
-            cancelKeyInput: document.getElementById('cancelKeyInput')
+            cancelKeyInput: document.getElementById('cancelKeyInput'),
+
+            // Pressure Mode
+            pressureBarContainer: document.getElementById('pressureBarContainer'),
+            pressureBarFill: document.getElementById('pressureBarFill'),
+            pressureBarText: document.getElementById('pressureBarText'),
+            pressureModeCheckbox: document.getElementById('pressureModeCheckbox'),
+            pressureDrainRateInput: document.getElementById('pressureDrainRateInput')
         };
     }
 
@@ -498,18 +503,74 @@ class UIManager {
     }
 
     /**
-     * Set auto-advance settings
-     */
-    setAutoAdvanceSettings(enabled, delay) {
-        this.elements.autoAdvanceCheckbox.checked = enabled;
-        this.elements.autoAdvanceDelayInput.value = delay;
-    }
-
-    /**
      * Set fake attacks settings
      */
     setFakeAttacksSettings(enabled, cancelKey) {
         this.elements.fakeAttacksCheckbox.checked = enabled;
         this.elements.cancelKeyInput.value = cancelKey;
+    }
+
+    /**
+     * Show pressure bar
+     */
+    showPressureBar() {
+        this.elements.pressureBarContainer.style.display = 'block';
+    }
+
+    /**
+     * Hide pressure bar
+     */
+    hidePressureBar() {
+        this.elements.pressureBarContainer.style.display = 'none';
+    }
+
+    /**
+     * Update pressure bar percentage
+     */
+    updatePressureBar(percentage) {
+        this.elements.pressureBarFill.style.width = `${percentage}%`;
+        this.elements.pressureBarText.textContent = `${Math.round(percentage)}%`;
+    }
+
+    /**
+     * Set pressure bar to warning state
+     */
+    setPressureBarWarning() {
+        this.elements.pressureBarFill.classList.remove('critical');
+        this.elements.pressureBarFill.classList.add('warning');
+    }
+
+    /**
+     * Set pressure bar to critical state
+     */
+    setPressureBarCritical() {
+        this.elements.pressureBarFill.classList.remove('warning');
+        this.elements.pressureBarFill.classList.add('critical');
+    }
+
+    /**
+     * Reset pressure bar state
+     */
+    resetPressureBarState() {
+        this.elements.pressureBarFill.classList.remove('warning', 'critical');
+    }
+
+    /**
+     * Show game over flash overlay
+     */
+    showGameOverFlash() {
+        const overlay = document.createElement('div');
+        overlay.className = 'pressure-game-over';
+        overlay.textContent = 'GAME OVER!';
+        document.querySelector('.main-display').appendChild(overlay);
+        setTimeout(() => overlay.remove(), 800);
+    }
+
+    /**
+     * Set pressure mode settings in config UI
+     */
+    setPressureModeSettings(enabled, drainRate) {
+        this.elements.pressureModeCheckbox.checked = enabled;
+        this.elements.pressureDrainRateInput.value = drainRate;
     }
 }
