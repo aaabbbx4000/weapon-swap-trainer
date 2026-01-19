@@ -66,20 +66,20 @@ class UIManager {
             pressureModeCheckbox: document.getElementById('pressureModeCheckbox'),
             pressureDrainRateInput: document.getElementById('pressureDrainRateInput'),
 
-            // Rhythm Mode
-            rhythmScreen: document.getElementById(SCREENS.RHYTHM),
-            rhythmModeButton: document.getElementById('rhythmModeButton'),
-            stopRhythmButton: document.getElementById('stopRhythmButton'),
-            rhythmLanesContainer: document.getElementById('rhythmLanesContainer'),
-            rhythmLanes: document.getElementById('rhythmLanes'),
-            rhythmLaneLabels: document.getElementById('rhythmLaneLabels'),
-            rhythmHitZone: document.getElementById('rhythmHitZone'),
-            rhythmHits: document.getElementById('rhythmHits'),
-            rhythmMisses: document.getElementById('rhythmMisses'),
-            rhythmAccuracy: document.getElementById('rhythmAccuracy'),
-            rhythmTime: document.getElementById('rhythmTime'),
-            rhythmSpeedSelect: document.getElementById('rhythmSpeedSelect'),
-            rhythmDurationSelect: document.getElementById('rhythmDurationSelect'),
+            // Weapon Select Mode
+            weaponSelectScreen: document.getElementById(SCREENS.WEAPON_SELECT),
+            weaponSelectModeButton: document.getElementById('weaponSelectModeButton'),
+            stopWeaponSelectButton: document.getElementById('stopWeaponSelectButton'),
+            weaponSelectLanesContainer: document.getElementById('weaponSelectLanesContainer'),
+            weaponSelectLanes: document.getElementById('weaponSelectLanes'),
+            weaponSelectLaneLabels: document.getElementById('weaponSelectLaneLabels'),
+            weaponSelectHitZone: document.getElementById('weaponSelectHitZone'),
+            weaponSelectHits: document.getElementById('weaponSelectHits'),
+            weaponSelectMisses: document.getElementById('weaponSelectMisses'),
+            weaponSelectAccuracy: document.getElementById('weaponSelectAccuracy'),
+            weaponSelectTime: document.getElementById('weaponSelectTime'),
+            weaponSelectSpeedSelect: document.getElementById('weaponSelectSpeedSelect'),
+            weaponSelectDurationSelect: document.getElementById('weaponSelectDurationSelect'),
 
             // Common Patterns
             patternsModal: document.getElementById('patternsModal'),
@@ -540,46 +540,46 @@ class UIManager {
         this.elements.pressureDrainRateInput.value = drainRate;
     }
 
-    // ==================== Rhythm Mode UI Methods ====================
+    // ==================== Weapon Select Mode UI Methods ====================
 
     /**
-     * Initialize rhythm lanes with weapon names
+     * Initialize weapon select lanes with weapon names
      */
-    renderRhythmLanes(slotKeybindings, weaponSlots) {
-        this.elements.rhythmLanes.innerHTML = '';
-        this.elements.rhythmLaneLabels.innerHTML = '';
+    renderWeaponSelectLanes(slotKeybindings, weaponSlots) {
+        this.elements.weaponSelectLanes.innerHTML = '';
+        this.elements.weaponSelectLaneLabels.innerHTML = '';
 
-        for (let i = 1; i <= CONFIG.RHYTHM_MODE.LANE_COUNT; i++) {
+        for (let i = 1; i <= CONFIG.WEAPON_SELECT_MODE.LANE_COUNT; i++) {
             // Create lane
             const lane = document.createElement('div');
-            lane.className = 'rhythm-lane';
+            lane.className = 'weapon-select-lane';
             lane.dataset.lane = i;
-            this.elements.rhythmLanes.appendChild(lane);
+            this.elements.weaponSelectLanes.appendChild(lane);
 
             // Create label with weapon name
             const label = document.createElement('div');
-            label.className = 'rhythm-lane-label';
+            label.className = 'weapon-select-lane-label';
             const weaponName = weaponSlots[i] || `Slot ${i}`;
             label.textContent = this.getShortWeaponName(weaponName);
             label.title = weaponName; // Full name on hover
-            this.elements.rhythmLaneLabels.appendChild(label);
+            this.elements.weaponSelectLaneLabels.appendChild(label);
         }
 
         // Set hit line position from config
-        this.elements.rhythmHitZone.style.bottom = `${CONFIG.RHYTHM_MODE.HIT_LINE_BOTTOM_PX}px`;
+        this.elements.weaponSelectHitZone.style.bottom = `${CONFIG.WEAPON_SELECT_MODE.HIT_LINE_BOTTOM_PX}px`;
     }
 
     /**
      * Calculate hit line position ratio based on actual element positions.
      * This ensures hit detection timing matches the visual line position.
-     * Must be called after the rhythm screen is visible.
+     * Must be called after the weapon select screen is visible.
      */
     calculateHitLineRatio() {
-        const lanes = this.elements.rhythmLanes;
-        const hitZone = this.elements.rhythmHitZone;
-        const noteHeight = CONFIG.RHYTHM_MODE.NOTE_HEIGHT;
-        const startOffset = CONFIG.RHYTHM_MODE.NOTE_START_OFFSET;
-        const endOffset = CONFIG.RHYTHM_MODE.NOTE_END_OFFSET;
+        const lanes = this.elements.weaponSelectLanes;
+        const hitZone = this.elements.weaponSelectHitZone;
+        const noteHeight = CONFIG.WEAPON_SELECT_MODE.NOTE_HEIGHT;
+        const startOffset = CONFIG.WEAPON_SELECT_MODE.NOTE_START_OFFSET;
+        const endOffset = CONFIG.WEAPON_SELECT_MODE.NOTE_END_OFFSET;
 
         // Get actual positions relative to the viewport
         const lanesRect = lanes.getBoundingClientRect();
@@ -619,11 +619,11 @@ class UIManager {
      * Create a note element in a lane
      */
     createNote(noteId, laneIndex, weaponName, fallDuration) {
-        const lane = this.elements.rhythmLanes.querySelector(`[data-lane="${laneIndex}"]`);
+        const lane = this.elements.weaponSelectLanes.querySelector(`[data-lane="${laneIndex}"]`);
         if (!lane) return null;
 
         const note = document.createElement('div');
-        note.className = 'rhythm-note';
+        note.className = 'weapon-select-note';
         note.dataset.noteId = noteId;
         note.dataset.lane = laneIndex;
         note.title = weaponName; // Full name on hover
@@ -644,7 +644,7 @@ class UIManager {
      * Remove a note by ID
      */
     removeNote(noteId) {
-        const note = this.elements.rhythmLanes.querySelector(`[data-note-id="${noteId}"]`);
+        const note = this.elements.weaponSelectLanes.querySelector(`[data-note-id="${noteId}"]`);
         if (note) {
             note.remove();
         }
@@ -654,7 +654,7 @@ class UIManager {
      * Mark a note as hit
      */
     markNoteHit(noteId) {
-        const note = this.elements.rhythmLanes.querySelector(`[data-note-id="${noteId}"]`);
+        const note = this.elements.weaponSelectLanes.querySelector(`[data-note-id="${noteId}"]`);
         if (note) {
             note.classList.add('note-hit');
             const laneIndex = note.dataset.lane;
@@ -667,7 +667,7 @@ class UIManager {
      * Mark a note as missed
      */
     markNoteMiss(noteId) {
-        const note = this.elements.rhythmLanes.querySelector(`[data-note-id="${noteId}"]`);
+        const note = this.elements.weaponSelectLanes.querySelector(`[data-note-id="${noteId}"]`);
         if (note) {
             note.classList.add('note-miss');
             const laneIndex = note.dataset.lane;
@@ -679,7 +679,7 @@ class UIManager {
      * Flash a lane for hit/miss feedback
      */
     flashLane(laneIndex, type) {
-        const lane = this.elements.rhythmLanes.querySelector(`[data-lane="${laneIndex}"]`);
+        const lane = this.elements.weaponSelectLanes.querySelector(`[data-lane="${laneIndex}"]`);
         if (lane) {
             lane.classList.add(`lane-${type}`);
             setTimeout(() => lane.classList.remove(`lane-${type}`), 150);
@@ -687,35 +687,35 @@ class UIManager {
     }
 
     /**
-     * Update rhythm stats display
+     * Update weapon select stats display
      */
-    updateRhythmStats(hits, misses, accuracy) {
-        this.elements.rhythmHits.textContent = hits;
-        this.elements.rhythmMisses.textContent = misses;
-        this.elements.rhythmAccuracy.textContent = `${accuracy}%`;
+    updateWeaponSelectStats(hits, misses, accuracy) {
+        this.elements.weaponSelectHits.textContent = hits;
+        this.elements.weaponSelectMisses.textContent = misses;
+        this.elements.weaponSelectAccuracy.textContent = `${accuracy}%`;
     }
 
     /**
-     * Update rhythm time display
+     * Update weapon select time display
      */
-    updateRhythmTime(seconds) {
-        this.elements.rhythmTime.textContent = seconds;
+    updateWeaponSelectTime(seconds) {
+        this.elements.weaponSelectTime.textContent = seconds;
     }
 
     /**
      * Clear all notes from lanes
      */
-    clearRhythmNotes() {
-        const notes = this.elements.rhythmLanes.querySelectorAll('.rhythm-note');
+    clearWeaponSelectNotes() {
+        const notes = this.elements.weaponSelectLanes.querySelectorAll('.weapon-select-note');
         notes.forEach(note => note.remove());
     }
 
     /**
-     * Show rhythm results on results screen
+     * Show weapon select results on results screen
      */
-    showRhythmResults(hits, misses, accuracy) {
-        this.elements.resultsTitle.textContent = 'Rhythm Round Complete!';
-        this.elements.resultsTitle.classList.add('rhythm-results-title');
+    showWeaponSelectResults(hits, misses, accuracy) {
+        this.elements.resultsTitle.textContent = 'Weapon Select Complete!';
+        this.elements.resultsTitle.classList.add('weapon-select-results-title');
 
         // Update stat values
         this.elements.avgTime.textContent = hits;
@@ -738,7 +738,7 @@ class UIManager {
      * Reset results screen to normal mode
      */
     resetResultsScreen() {
-        this.elements.resultsTitle.classList.remove('rhythm-results-title');
+        this.elements.resultsTitle.classList.remove('weapon-select-results-title');
 
         // Reset stat labels using cached elements
         if (this.statLabels) {
@@ -764,21 +764,21 @@ class UIManager {
     }
 
     /**
-     * Get rhythm mode settings
+     * Get weapon select mode settings
      */
-    getRhythmSettings() {
+    getWeaponSelectSettings() {
         return {
-            speed: this.elements.rhythmSpeedSelect.value,
-            duration: parseInt(this.elements.rhythmDurationSelect.value, 10)
+            speed: this.elements.weaponSelectSpeedSelect.value,
+            duration: parseInt(this.elements.weaponSelectDurationSelect.value, 10)
         };
     }
 
     /**
-     * Set rhythm mode settings
+     * Set weapon select mode settings
      */
-    setRhythmSettings(speed, duration) {
-        this.elements.rhythmSpeedSelect.value = speed;
-        this.elements.rhythmDurationSelect.value = duration.toString();
+    setWeaponSelectSettings(speed, duration) {
+        this.elements.weaponSelectSpeedSelect.value = speed;
+        this.elements.weaponSelectDurationSelect.value = duration.toString();
     }
 
     // ==================== Common Patterns UI Methods ====================

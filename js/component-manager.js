@@ -245,7 +245,7 @@ class ComponentManager {
     }
 
     /**
-     * Get pattern-aware next lane for rhythm mode
+     * Get pattern-aware next lane for weapon select mode
      * Returns a lane index (1-8) based on patterns, or null for random
      */
     getPatternAwareLane(prevLane) {

@@ -32,7 +32,7 @@ const CONFIG = {
         CRITICAL_THRESHOLD: 15
     },
 
-    RHYTHM_MODE: {
+    WEAPON_SELECT_MODE: {
         DEFAULT_NOTE_SPEED: 'slow',     // learning, slower, slow, medium, fast
         NOTE_SPEEDS: {
             learning: 5000,  // ms for note to fall
@@ -79,8 +79,8 @@ const CONFIG = {
         FAKE_ATTACKS_CANCEL_KEY: 'fakeAttacksCancelKey',
         PRESSURE_MODE_ENABLED: 'pressureModeEnabled',
         PRESSURE_DRAIN_RATE: 'pressureDrainRate',
-        RHYTHM_NOTE_SPEED: 'rhythmNoteSpeed',
-        RHYTHM_DURATION: 'rhythmDuration',
+        WEAPON_SELECT_NOTE_SPEED: 'weaponSelectNoteSpeed',
+        WEAPON_SELECT_DURATION: 'weaponSelectDuration',
         COMMON_PATTERNS: 'commonPatterns',
         PATTERN_LIKELIHOOD: 'patternLikelihood'
     }
@@ -91,7 +91,7 @@ const SCREENS = {
     COUNTDOWN: 'countdownScreen',
     TRAINING: 'trainingScreen',
     RESULTS: 'resultsScreen',
-    RHYTHM: 'rhythmScreen'
+    WEAPON_SELECT: 'weaponSelectScreen'
 };
 
 const KEY_MAPPINGS = {
@@ -150,13 +150,13 @@ const WEAPON_SKILL_IMAGES = {
 
 const DEFAULT_WEAPON_SLOTS = {
     1: 'Spear',
-    2: 'Reaper',
+    2: 'Greatsword',
     3: 'LongBow',
     4: 'Axe',
-    5: 'Pistols',
-    6: 'Sword',
+    5: 'Sword',
+    6: 'Pistols',
     7: 'Slasher',
-    8: 'Greatsword'
+    8: 'Reaper'
 };
 
 // Default keybindings for weapon slots (slot number -> key)

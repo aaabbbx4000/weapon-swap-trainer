@@ -887,18 +887,18 @@ input[type=number] {
     max-width: 200px;
 }
 
-.rhythm-mode-btn {
+.weapon-select-mode-btn {
     background: linear-gradient(135deg, #ff6b6b, #ee5a24) !important;
     box-shadow: 0 4px 20px rgba(238, 90, 36, 0.3) !important;
 }
 
-.rhythm-mode-btn:hover {
+.weapon-select-mode-btn:hover {
     background: linear-gradient(135deg, #ff7675, #ff6348) !important;
     box-shadow: 0 6px 30px rgba(238, 90, 36, 0.5) !important;
 }
 
-/* Rhythm Mode Screen */
-#rhythmScreen {
+/* Weapon Select Mode Screen */
+#weaponSelectScreen {
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -906,7 +906,7 @@ input[type=number] {
     padding: 0;
 }
 
-.rhythm-header {
+.weapon-select-header {
     width: 100%;
     display: flex;
     justify-content: space-between;
@@ -914,20 +914,20 @@ input[type=number] {
     margin-bottom: 20px;
 }
 
-.rhythm-title {
+.weapon-select-title {
     font-size: 1.5em;
     color: #ff6b6b;
     font-weight: bold;
     letter-spacing: 2px;
 }
 
-.rhythm-game-area {
+.weapon-select-game-area {
     width: 100%;
     display: flex;
     justify-content: center;
 }
 
-.rhythm-lanes-container {
+.weapon-select-lanes-container {
     position: relative;
     width: 100%;
     max-width: 600px;
@@ -938,7 +938,7 @@ input[type=number] {
     border: 2px solid rgba(255, 255, 255, 0.1);
 }
 
-.rhythm-lane-labels {
+.weapon-select-lane-labels {
     position: absolute;
     top: 0;
     left: 0;
@@ -949,7 +949,7 @@ input[type=number] {
     padding: 8px 0;
 }
 
-.rhythm-lane-label {
+.weapon-select-lane-label {
     flex: 1;
     text-align: center;
     font-size: 0.75em;
@@ -964,7 +964,7 @@ input[type=number] {
     padding: 0 2px;
 }
 
-.rhythm-lanes {
+.weapon-select-lanes {
     position: absolute;
     top: 40px;
     bottom: 60px;
@@ -973,27 +973,27 @@ input[type=number] {
     display: flex;
 }
 
-.rhythm-lane {
+.weapon-select-lane {
     flex: 1;
     position: relative;
     border-right: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.rhythm-lane:last-child {
+.weapon-select-lane:last-child {
     border-right: none;
 }
 
-.rhythm-lane.lane-hit {
+.weapon-select-lane.lane-hit {
     background: rgba(0, 255, 136, 0.2);
     transition: background 0.1s;
 }
 
-.rhythm-lane.lane-miss {
+.weapon-select-lane.lane-miss {
     background: rgba(255, 68, 68, 0.2);
     transition: background 0.1s;
 }
 
-.rhythm-hit-zone {
+.weapon-select-hit-zone {
     position: absolute;
     bottom: 100px;
     left: 0;
@@ -1003,7 +1003,7 @@ input[type=number] {
     box-shadow: 0 0 15px rgba(0, 217, 255, 0.5);
 }
 
-.rhythm-note {
+.weapon-select-note {
     position: absolute;
     width: 70%;
     aspect-ratio: 1;
@@ -1019,7 +1019,7 @@ input[type=number] {
     overflow: hidden;
 }
 
-.rhythm-note span {
+.weapon-select-note span {
     transform: rotate(-45deg);
     font-weight: bold;
     font-size: 0.55em;
@@ -1028,19 +1028,19 @@ input[type=number] {
     text-transform: uppercase;
 }
 
-.rhythm-note.note-hit {
+.weapon-select-note.note-hit {
     background: linear-gradient(135deg, #00ff88, #00d9ff);
     transform: translateX(-50%) rotate(45deg) scale(1.3);
     opacity: 0;
     transition: all 0.15s ease-out;
 }
 
-.rhythm-note.note-miss {
+.weapon-select-note.note-miss {
     background: linear-gradient(135deg, #666, #444);
     opacity: 0.3;
 }
 
-.rhythm-stats {
+.weapon-select-stats {
     display: flex;
     gap: 30px;
     margin-top: 20px;
@@ -1048,29 +1048,29 @@ input[type=number] {
     justify-content: center;
 }
 
-.rhythm-stat {
+.weapon-select-stat {
     font-size: 1.1em;
     color: #e4e4e4;
 }
 
-.rhythm-stat span {
+.weapon-select-stat span {
     color: #00d9ff;
     font-weight: bold;
     font-family: 'Courier New', monospace;
 }
 
-.rhythm-stat.rhythm-time span {
+.weapon-select-stat.weapon-select-time span {
     color: #ffd700;
 }
 
-/* Rhythm Results */
-.rhythm-results-title {
+/* Weapon Select Results */
+.weapon-select-results-title {
     font-size: 2.5em;
     color: #ff6b6b;
     margin-bottom: 10px;
 }
 
-.rhythm-results-subtitle {
+.weapon-select-results-subtitle {
     font-size: 1.2em;
     color: #b0b0b0;
     margin-bottom: 30px;

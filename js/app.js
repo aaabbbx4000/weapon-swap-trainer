@@ -7,7 +7,7 @@ class TrainingApp {
         this.componentManager = new ComponentManager();
         this.statisticsManager = new StatisticsManager();
         this.ui = new UIManager();
-        this.rhythmController = null; // Initialized after componentManager
+        this.weaponSelectController = null; // Initialized after componentManager
 
         this.state = {
             // Round settings (loaded from storage)
@@ -30,7 +30,7 @@ class TrainingApp {
             startTime: null,
 
             // Mode tracking
-            lastModeWasRhythm: false
+            lastModeWasWeaponSelect: false
         };
 
         this.timers = {
@@ -49,13 +49,13 @@ class TrainingApp {
     async init() {
         await this.componentManager.init();
 
-        // Initialize rhythm controller with dependencies
-        this.rhythmController = new RhythmModeController(
+        // Initialize weapon select controller with dependencies
+        this.weaponSelectController = new WeaponSelectModeController(
             this.componentManager,
             this.ui,
             CONFIG
         );
-        this.rhythmController.loadSettings();
+        this.weaponSelectController.loadSettings();
 
         // Load settings from storage
         this.loadSettings();
@@ -89,9 +89,9 @@ class TrainingApp {
             this.state.pressureModeEnabled,
             this.state.pressureDrainRate
         );
-        this.ui.setRhythmSettings(
-            this.rhythmController.state.speed,
-            this.rhythmController.state.duration
+        this.ui.setWeaponSelectSettings(
+            this.weaponSelectController.state.speed,
+            this.weaponSelectController.state.duration
         );
     }
 
@@ -176,23 +176,23 @@ class TrainingApp {
             StorageManager.savePressureDrainRate(value);
         });
 
-        // Rhythm mode events
-        this.ui.elements.rhythmModeButton.addEventListener('click', () => this.startRhythmMode());
-        this.ui.elements.stopRhythmButton.addEventListener('click', () => this.stopRhythmMode());
+        // Weapon select mode events
+        this.ui.elements.weaponSelectModeButton.addEventListener('click', () => this.startWeaponSelectMode());
+        this.ui.elements.stopWeaponSelectButton.addEventListener('click', () => this.stopWeaponSelectMode());
 
-        this.ui.elements.rhythmSpeedSelect.addEventListener('change', (e) => {
-            this.rhythmController.saveSettings(e.target.value, undefined);
+        this.ui.elements.weaponSelectSpeedSelect.addEventListener('change', (e) => {
+            this.weaponSelectController.saveSettings(e.target.value, undefined);
         });
 
-        this.ui.elements.rhythmDurationSelect.addEventListener('change', (e) => {
-            this.rhythmController.saveSettings(undefined, parseInt(e.target.value, 10));
+        this.ui.elements.weaponSelectDurationSelect.addEventListener('change', (e) => {
+            this.weaponSelectController.saveSettings(undefined, parseInt(e.target.value, 10));
         });
 
         // Global input events
         document.addEventListener('keydown', (e) => this.handleKeyDown(e));
         document.addEventListener('mousedown', (e) => this.handleMouseDown(e));
         document.addEventListener('contextmenu', (e) => {
-            if (this.state.isTraining || this.rhythmController.isActive()) {
+            if (this.state.isTraining || this.weaponSelectController.isActive()) {
                 e.preventDefault();
             }
         });
@@ -388,7 +388,7 @@ class TrainingApp {
      * Show results screen
      */
     showResults() {
-        this.state.lastModeWasRhythm = false;
+        this.state.lastModeWasWeaponSelect = false;
         this.clearTimer('pressureDrain');
         this.ui.showScreen(SCREENS.RESULTS);
         this.ui.toggleTrainingButtons(false);
@@ -500,18 +500,18 @@ class TrainingApp {
                 this.closeConfigModal();
             } else if (this.ui.elements.patternsModal.style.display === 'flex') {
                 this.closePatternsModal();
-            } else if (this.rhythmController.isActive()) {
-                this.stopRhythmMode();
+            } else if (this.weaponSelectController.isActive()) {
+                this.stopWeaponSelectMode();
             }
             return;
         }
 
-        // Rhythm mode input
-        if (this.rhythmController.isActive()) {
+        // Weapon select mode input
+        if (this.weaponSelectController.isActive()) {
             e.preventDefault();
             const key = KeyCapture.getKeyName(e);
             if (key) {
-                this.rhythmController.processInput(key);
+                this.weaponSelectController.processInput(key);
             }
             return;
         }
@@ -545,11 +545,11 @@ class TrainingApp {
             return;
         }
 
-        // Rhythm mode mouse input
-        if (this.rhythmController.isActive()) {
+        // Weapon select mode mouse input
+        if (this.weaponSelectController.isActive()) {
             e.preventDefault();
             const buttonName = KeyCapture.getMouseButtonName(e);
-            this.rhythmController.processInput(buttonName);
+            this.weaponSelectController.processInput(buttonName);
             return;
         }
 
@@ -594,25 +594,25 @@ class TrainingApp {
         }
     }
 
-    // ==================== Rhythm Mode ====================
+    // ==================== Weapon Select Mode ====================
 
     /**
-     * Start rhythm mode
+     * Start weapon select mode
      */
-    startRhythmMode() {
-        this.rhythmController.start((stats) => {
-            this.state.lastModeWasRhythm = true;
+    startWeaponSelectMode() {
+        this.weaponSelectController.start((stats) => {
+            this.state.lastModeWasWeaponSelect = true;
             this.ui.showScreen(SCREENS.RESULTS);
         });
 
         this.ui.showScreen(SCREENS.COUNTDOWN);
-        this.startRhythmCountdown();
+        this.startWeaponSelectCountdown();
     }
 
     /**
-     * Start rhythm countdown
+     * Start weapon select countdown
      */
-    startRhythmCountdown() {
+    startWeaponSelectCountdown() {
         let count = CONFIG.COUNTDOWN_START;
         this.ui.updateCountdown(count);
 
@@ -622,20 +622,20 @@ class TrainingApp {
                 this.ui.updateCountdown(count);
             } else {
                 this.clearTimer('countdown');
-                this.ui.showScreen(SCREENS.RHYTHM);
-                this.rhythmController.beginGame();
+                this.ui.showScreen(SCREENS.WEAPON_SELECT);
+                this.weaponSelectController.beginGame();
             }
         }, CONFIG.COUNTDOWN_INTERVAL);
     }
 
     /**
-     * Stop rhythm mode
+     * Stop weapon select mode
      */
-    stopRhythmMode() {
+    stopWeaponSelectMode() {
         this.clearTimer('countdown');
-        this.rhythmController.stop();
+        this.weaponSelectController.stop();
 
-        if (!this.rhythmController.state.hits && !this.rhythmController.state.misses) {
+        if (!this.weaponSelectController.state.hits && !this.weaponSelectController.state.misses) {
             this.ui.showScreen(SCREENS.WELCOME);
         }
     }
@@ -814,8 +814,8 @@ class TrainingApp {
      * Handle new round button click
      */
     handleNewRound() {
-        if (this.state.lastModeWasRhythm) {
-            this.state.lastModeWasRhythm = false;
+        if (this.state.lastModeWasWeaponSelect) {
+            this.state.lastModeWasWeaponSelect = false;
             this.ui.resetResultsScreen();
             this.ui.showScreen(SCREENS.WELCOME);
         } else {

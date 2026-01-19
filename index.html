@@ -46,8 +46,8 @@
                 </div>
                 <div class="welcome-controls">
                     <div class="mode-buttons">
-                        <button id="startButton" class="start-button-large">Skill Training</button>
-                        <button id="rhythmModeButton" class="start-button-large rhythm-mode-btn">Rhythm Mode</button>
+                        <button id="startButton" class="start-button-large">Weapon Attack</button>
+                        <button id="weaponSelectModeButton" class="start-button-large weapon-select-mode-btn">Weapon Select</button>
                     </div>
                     <div class="round-size-control-inline">
                         <label for="roundSizeInput">Round Size:</label>
@@ -118,24 +118,24 @@
                 </div>
             </div>
 
-            <!-- Rhythm Mode Screen -->
-            <div id="rhythmScreen" class="hidden">
-                <div class="rhythm-header">
-                    <div class="rhythm-title">RHYTHM MODE</div>
-                    <button id="stopRhythmButton" class="stop-button-inline">Stop</button>
+            <!-- Weapon Select Mode Screen -->
+            <div id="weaponSelectScreen" class="hidden">
+                <div class="weapon-select-header">
+                    <div class="weapon-select-title">WEAPON SELECT MODE</div>
+                    <button id="stopWeaponSelectButton" class="stop-button-inline">Stop</button>
                 </div>
-                <div class="rhythm-game-area">
-                    <div class="rhythm-lanes-container" id="rhythmLanesContainer">
-                        <div class="rhythm-lane-labels" id="rhythmLaneLabels"></div>
-                        <div class="rhythm-lanes" id="rhythmLanes"></div>
-                        <div class="rhythm-hit-zone" id="rhythmHitZone"></div>
+                <div class="weapon-select-game-area">
+                    <div class="weapon-select-lanes-container" id="weaponSelectLanesContainer">
+                        <div class="weapon-select-lane-labels" id="weaponSelectLaneLabels"></div>
+                        <div class="weapon-select-lanes" id="weaponSelectLanes"></div>
+                        <div class="weapon-select-hit-zone" id="weaponSelectHitZone"></div>
                     </div>
                 </div>
-                <div class="rhythm-stats">
-                    <span class="rhythm-stat">Hits: <span id="rhythmHits">0</span></span>
-                    <span class="rhythm-stat">Misses: <span id="rhythmMisses">0</span></span>
-                    <span class="rhythm-stat">Accuracy: <span id="rhythmAccuracy">100%</span></span>
-                    <span class="rhythm-stat rhythm-time">Time: <span id="rhythmTime">60</span>s</span>
+                <div class="weapon-select-stats">
+                    <span class="weapon-select-stat">Hits: <span id="weaponSelectHits">0</span></span>
+                    <span class="weapon-select-stat">Misses: <span id="weaponSelectMisses">0</span></span>
+                    <span class="weapon-select-stat">Accuracy: <span id="weaponSelectAccuracy">100%</span></span>
+                    <span class="weapon-select-stat weapon-select-time">Time: <span id="weaponSelectTime">60</span>s</span>
                 </div>
             </div>
         </div>
@@ -215,12 +215,12 @@
                     </div>
                 </div>
 
-                <!-- Rhythm Mode Settings -->
-                <div class="rhythm-mode-section" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #444;">
-                    <h4 style="color: #00d9ff; margin-bottom: 15px;">Rhythm Mode Settings</h4>
+                <!-- Weapon Select Mode Settings -->
+                <div class="weapon-select-mode-section" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #444;">
+                    <h4 style="color: #00d9ff; margin-bottom: 15px;">Weapon Select Mode Settings</h4>
                     <div style="margin-bottom: 10px;">
-                        <label for="rhythmSpeedSelect">Note Speed:</label>
-                        <select id="rhythmSpeedSelect" style="width: 120px; margin-left: 10px;">
+                        <label for="weaponSelectSpeedSelect">Note Speed:</label>
+                        <select id="weaponSelectSpeedSelect" style="width: 120px; margin-left: 10px;">
                             <option value="learning">Learning</option>
                             <option value="slower">Slower</option>
                             <option value="slow" selected>Slow</option>
@@ -229,8 +229,8 @@
                         </select>
                     </div>
                     <div style="margin-bottom: 10px;">
-                        <label for="rhythmDurationSelect">Duration:</label>
-                        <select id="rhythmDurationSelect" style="width: 120px; margin-left: 10px;">
+                        <label for="weaponSelectDurationSelect">Duration:</label>
+                        <select id="weaponSelectDurationSelect" style="width: 120px; margin-left: 10px;">
                             <option value="30">30 seconds</option>
                             <option value="60" selected>60 seconds</option>
                             <option value="90">90 seconds</option>
@@ -277,7 +277,7 @@
     <script src="js/statistics-manager.js"></script>
     <script src="js/component-manager.js"></script>
     <script src="js/ui-manager.js"></script>
-    <script src="js/rhythm-controller.js"></script>
+    <script src="js/weapon-select-controller.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>
