@@ -33,13 +33,14 @@ const CONFIG = {
     },
 
     WEAPON_SELECT_MODE: {
-        DEFAULT_NOTE_SPEED: 'slow',     // learning, slower, slow, medium, fast
+        DEFAULT_NOTE_SPEED: 'slow',     // learning, slower, slow, medium, fast, fastest
         NOTE_SPEEDS: {
             learning: 5000,  // ms for note to fall
             slower: 4000,
             slow: 3200,
             medium: 2500,
-            fast: 2000
+            fast: 2000,
+            fastest: 1500
         },
         DEFAULT_SPAWN_RATE: 800,        // ms between notes
         SPAWN_RATES: {
@@ -47,7 +48,8 @@ const CONFIG = {
             slower: 1600,
             slow: 1300,
             medium: 1000,
-            fast: 800
+            fast: 800,
+            fastest: 600
         },
         HIT_WINDOW: 200,                // ms before/after target for a hit
         HIT_LINE_BOTTOM_PX: 100,        // hit line position from bottom (pixels)
