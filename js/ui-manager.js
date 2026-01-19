@@ -5,6 +5,8 @@
 class UIManager {
     constructor() {
         this.elements = this.cacheElements();
+        this.statLabels = null;
+        this.cacheStatLabels();
     }
 
     /**
@@ -62,7 +64,30 @@ class UIManager {
             pressureBarFill: document.getElementById('pressureBarFill'),
             pressureBarText: document.getElementById('pressureBarText'),
             pressureModeCheckbox: document.getElementById('pressureModeCheckbox'),
-            pressureDrainRateInput: document.getElementById('pressureDrainRateInput')
+            pressureDrainRateInput: document.getElementById('pressureDrainRateInput'),
+
+            // Rhythm Mode
+            rhythmScreen: document.getElementById(SCREENS.RHYTHM),
+            rhythmModeButton: document.getElementById('rhythmModeButton'),
+            stopRhythmButton: document.getElementById('stopRhythmButton'),
+            rhythmLanesContainer: document.getElementById('rhythmLanesContainer'),
+            rhythmLanes: document.getElementById('rhythmLanes'),
+            rhythmLaneLabels: document.getElementById('rhythmLaneLabels'),
+            rhythmHitZone: document.getElementById('rhythmHitZone'),
+            rhythmHits: document.getElementById('rhythmHits'),
+            rhythmMisses: document.getElementById('rhythmMisses'),
+            rhythmAccuracy: document.getElementById('rhythmAccuracy'),
+            rhythmTime: document.getElementById('rhythmTime'),
+            rhythmSpeedSelect: document.getElementById('rhythmSpeedSelect'),
+            rhythmDurationSelect: document.getElementById('rhythmDurationSelect'),
+
+            // Common Patterns
+            patternsModal: document.getElementById('patternsModal'),
+            commonPatternsBtn: document.getElementById('commonPatternsBtn'),
+            closePatternsBtn: document.getElementById('closePatternsBtn'),
+            patternsList: document.getElementById('patternsList'),
+            patternLikelihoodInput: document.getElementById('patternLikelihoodInput'),
+            addPatternBtn: document.getElementById('addPatternBtn')
         };
     }
 
@@ -399,45 +424,15 @@ class UIManager {
                 weaponChangeCallback(slot, e.target.value);
             });
 
+            // Use KeyCapture utility for consistent key capture
             const keyInput = item.querySelector('.slot-key-input');
-            let isInitialClick = true;
-
-            // Capture actual key press instead of typed input
-            keyInput.addEventListener('keydown', (e) => {
-                e.preventDefault();
-                const key = this.getKeyName(e);
-                if (key) {
+            KeyCapture.setupInput(
+                keyInput,
+                (key) => {
                     keybindingChangeCallback(slot, key);
                     keyInput.value = key;
                 }
-            });
-
-            // Capture mouse button clicks (but not the initial click to focus)
-            keyInput.addEventListener('mousedown', (e) => {
-                if (!document.activeElement || document.activeElement !== keyInput) {
-                    // This is the initial click to focus - allow it
-                    isInitialClick = true;
-                    return;
-                }
-
-                // Input is already focused - capture this as a binding
-                e.preventDefault();
-                const buttonName = this.getMouseButtonName(e);
-                keybindingChangeCallback(slot, buttonName);
-                keyInput.value = buttonName;
-                keyInput.blur(); // Remove focus after capturing
-                isInitialClick = true; // Reset for next time
-            });
-
-            // Reset isInitialClick when input gets focus
-            keyInput.addEventListener('focus', () => {
-                isInitialClick = false;
-            });
-
-            // Prevent context menu on right-click
-            keyInput.addEventListener('contextmenu', (e) => {
-                e.preventDefault();
-            });
+            );
 
             this.elements.weaponSlotsList.appendChild(item);
         }
@@ -445,47 +440,18 @@ class UIManager {
 
     /**
      * Get normalized key name from keyboard event
+     * Delegates to KeyCapture utility for consistency
      */
     getKeyName(event) {
-        // Ignore certain keys that shouldn't be bindable
-        const ignoredKeys = ['Tab', 'Escape', 'Enter', 'CapsLock', 'NumLock', 'ScrollLock'];
-        if (ignoredKeys.includes(event.key)) {
-            return null;
-        }
-
-        // Handle special key names
-        const keyMap = {
-            'Control': 'Ctrl',
-            'ControlLeft': 'LeftCtrl',
-            'ControlRight': 'RightCtrl',
-            'ShiftLeft': 'LeftShift',
-            'ShiftRight': 'RightShift',
-            'AltLeft': 'LeftAlt',
-            'AltRight': 'RightAlt',
-            ' ': 'Space'
-        };
-
-        // Check if we should use code for left/right distinction
-        if (event.code && (event.code.startsWith('Control') || event.code.startsWith('Shift') || event.code.startsWith('Alt'))) {
-            return keyMap[event.code] || event.code;
-        }
-
-        return keyMap[event.key] || event.key;
+        return KeyCapture.getKeyName(event);
     }
 
     /**
      * Get mouse button name from mouse event
+     * Delegates to KeyCapture utility for consistency
      */
     getMouseButtonName(event) {
-        const buttonNames = {
-            0: 'Mouse1',
-            1: 'Mouse3',  // Middle button
-            2: 'Mouse2',  // Right button
-            3: 'Mouse4',  // Back button
-            4: 'Mouse5'   // Forward button
-        };
-
-        return buttonNames[event.button] || `Mouse${event.button}`;
+        return KeyCapture.getMouseButtonName(event);
     }
 
     /**
@@ -572,5 +538,353 @@ class UIManager {
     setPressureModeSettings(enabled, drainRate) {
         this.elements.pressureModeCheckbox.checked = enabled;
         this.elements.pressureDrainRateInput.value = drainRate;
+    }
+
+    // ==================== Rhythm Mode UI Methods ====================
+
+    /**
+     * Initialize rhythm lanes with weapon names
+     */
+    renderRhythmLanes(slotKeybindings, weaponSlots) {
+        this.elements.rhythmLanes.innerHTML = '';
+        this.elements.rhythmLaneLabels.innerHTML = '';
+
+        for (let i = 1; i <= CONFIG.RHYTHM_MODE.LANE_COUNT; i++) {
+            // Create lane
+            const lane = document.createElement('div');
+            lane.className = 'rhythm-lane';
+            lane.dataset.lane = i;
+            this.elements.rhythmLanes.appendChild(lane);
+
+            // Create label with weapon name
+            const label = document.createElement('div');
+            label.className = 'rhythm-lane-label';
+            const weaponName = weaponSlots[i] || `Slot ${i}`;
+            label.textContent = this.getShortWeaponName(weaponName);
+            label.title = weaponName; // Full name on hover
+            this.elements.rhythmLaneLabels.appendChild(label);
+        }
+
+        // Set hit line position from config
+        this.elements.rhythmHitZone.style.bottom = `${CONFIG.RHYTHM_MODE.HIT_LINE_BOTTOM_PX}px`;
+    }
+
+    /**
+     * Calculate hit line position ratio based on actual element positions.
+     * This ensures hit detection timing matches the visual line position.
+     * Must be called after the rhythm screen is visible.
+     */
+    calculateHitLineRatio() {
+        const lanes = this.elements.rhythmLanes;
+        const hitZone = this.elements.rhythmHitZone;
+        const noteHeight = CONFIG.RHYTHM_MODE.NOTE_HEIGHT;
+        const startOffset = CONFIG.RHYTHM_MODE.NOTE_START_OFFSET;
+        const endOffset = CONFIG.RHYTHM_MODE.NOTE_END_OFFSET;
+
+        // Get actual positions relative to the viewport
+        const lanesRect = lanes.getBoundingClientRect();
+        const hitZoneRect = hitZone.getBoundingClientRect();
+
+        // Calculate where the hit zone is relative to the lanes
+        const lanesHeight = lanesRect.height;
+        const hitLineFromLanesTop = hitZoneRect.top - lanesRect.top;
+
+        // Animation goes from -startOffset to lanesHeight + endOffset
+        const totalDistance = lanesHeight + startOffset + endOffset;
+
+        // Note center should be at hit line: note_top + noteHeight/2 = hitLineFromLanesTop
+        // So note_top = hitLineFromLanesTop - noteHeight/2
+        // Distance from start (-startOffset) to note_top:
+        const distanceToLine = (hitLineFromLanesTop - noteHeight / 2) - (-startOffset);
+
+        // Ratio of fall duration when note center reaches the line
+        return distanceToLine / totalDistance;
+    }
+
+    /**
+     * Get shortened weapon name for display
+     */
+    getShortWeaponName(weaponName) {
+        const shortNames = {
+            'Greatsword': 'GS',
+            'Crossbow': 'XBow',
+            'LongBow': 'Bow',
+            'TwinBlade': 'Twin',
+            'Pistols': 'Guns'
+        };
+        return shortNames[weaponName] || weaponName;
+    }
+
+    /**
+     * Create a note element in a lane
+     */
+    createNote(noteId, laneIndex, weaponName, fallDuration) {
+        const lane = this.elements.rhythmLanes.querySelector(`[data-lane="${laneIndex}"]`);
+        if (!lane) return null;
+
+        const note = document.createElement('div');
+        note.className = 'rhythm-note';
+        note.dataset.noteId = noteId;
+        note.dataset.lane = laneIndex;
+        note.title = weaponName; // Full name on hover
+
+        // Wrap text in span for counter-rotation
+        const textSpan = document.createElement('span');
+        textSpan.textContent = this.getShortWeaponName(weaponName);
+        note.appendChild(textSpan);
+
+        note.style.top = '-40px';
+        note.style.animation = `noteFall ${fallDuration}ms linear forwards`;
+
+        lane.appendChild(note);
+        return note;
+    }
+
+    /**
+     * Remove a note by ID
+     */
+    removeNote(noteId) {
+        const note = this.elements.rhythmLanes.querySelector(`[data-note-id="${noteId}"]`);
+        if (note) {
+            note.remove();
+        }
+    }
+
+    /**
+     * Mark a note as hit
+     */
+    markNoteHit(noteId) {
+        const note = this.elements.rhythmLanes.querySelector(`[data-note-id="${noteId}"]`);
+        if (note) {
+            note.classList.add('note-hit');
+            const laneIndex = note.dataset.lane;
+            this.flashLane(laneIndex, 'hit');
+            setTimeout(() => note.remove(), 150);
+        }
+    }
+
+    /**
+     * Mark a note as missed
+     */
+    markNoteMiss(noteId) {
+        const note = this.elements.rhythmLanes.querySelector(`[data-note-id="${noteId}"]`);
+        if (note) {
+            note.classList.add('note-miss');
+            const laneIndex = note.dataset.lane;
+            this.flashLane(laneIndex, 'miss');
+        }
+    }
+
+    /**
+     * Flash a lane for hit/miss feedback
+     */
+    flashLane(laneIndex, type) {
+        const lane = this.elements.rhythmLanes.querySelector(`[data-lane="${laneIndex}"]`);
+        if (lane) {
+            lane.classList.add(`lane-${type}`);
+            setTimeout(() => lane.classList.remove(`lane-${type}`), 150);
+        }
+    }
+
+    /**
+     * Update rhythm stats display
+     */
+    updateRhythmStats(hits, misses, accuracy) {
+        this.elements.rhythmHits.textContent = hits;
+        this.elements.rhythmMisses.textContent = misses;
+        this.elements.rhythmAccuracy.textContent = `${accuracy}%`;
+    }
+
+    /**
+     * Update rhythm time display
+     */
+    updateRhythmTime(seconds) {
+        this.elements.rhythmTime.textContent = seconds;
+    }
+
+    /**
+     * Clear all notes from lanes
+     */
+    clearRhythmNotes() {
+        const notes = this.elements.rhythmLanes.querySelectorAll('.rhythm-note');
+        notes.forEach(note => note.remove());
+    }
+
+    /**
+     * Show rhythm results on results screen
+     */
+    showRhythmResults(hits, misses, accuracy) {
+        this.elements.resultsTitle.textContent = 'Rhythm Round Complete!';
+        this.elements.resultsTitle.classList.add('rhythm-results-title');
+
+        // Update stat values
+        this.elements.avgTime.textContent = hits;
+        this.elements.fastestTime.textContent = misses;
+        this.elements.slowestTime.textContent = `${accuracy}%`;
+
+        // Update stat labels using cached elements
+        if (this.statLabels) {
+            this.statLabels.avgTime.textContent = 'Total Hits';
+            this.statLabels.fastestTime.textContent = 'Total Misses';
+            this.statLabels.slowestTime.textContent = 'Accuracy';
+        }
+
+        this.elements.newPBCount.parentElement.style.display = 'none';
+        this.elements.resultsList.innerHTML = '';
+        this.elements.resultsList.parentElement.style.display = 'none';
+    }
+
+    /**
+     * Reset results screen to normal mode
+     */
+    resetResultsScreen() {
+        this.elements.resultsTitle.classList.remove('rhythm-results-title');
+
+        // Reset stat labels using cached elements
+        if (this.statLabels) {
+            this.statLabels.avgTime.textContent = 'Average Time';
+            this.statLabels.fastestTime.textContent = 'Fastest';
+            this.statLabels.slowestTime.textContent = 'Slowest';
+        }
+
+        this.elements.newPBCount.parentElement.style.display = '';
+        this.elements.resultsList.parentElement.style.display = '';
+    }
+
+    /**
+     * Cache stat label elements (called once on init)
+     */
+    cacheStatLabels() {
+        const statCards = document.querySelectorAll('.stat-card');
+        this.statLabels = {
+            avgTime: statCards[0]?.querySelector('.stat-label'),
+            fastestTime: statCards[1]?.querySelector('.stat-label'),
+            slowestTime: statCards[2]?.querySelector('.stat-label')
+        };
+    }
+
+    /**
+     * Get rhythm mode settings
+     */
+    getRhythmSettings() {
+        return {
+            speed: this.elements.rhythmSpeedSelect.value,
+            duration: parseInt(this.elements.rhythmDurationSelect.value, 10)
+        };
+    }
+
+    /**
+     * Set rhythm mode settings
+     */
+    setRhythmSettings(speed, duration) {
+        this.elements.rhythmSpeedSelect.value = speed;
+        this.elements.rhythmDurationSelect.value = duration.toString();
+    }
+
+    // ==================== Common Patterns UI Methods ====================
+
+    /**
+     * Generate all skill options for pattern dropdowns
+     */
+    generateSkillOptions(weaponSlots) {
+        const options = ['<option value="">-- Select Skill --</option>'];
+
+        for (let slot = 1; slot <= 8; slot++) {
+            const weapon = weaponSlots[slot];
+            if (weapon) {
+                options.push(`<option value="${weapon}-Q">${weapon} Q</option>`);
+                options.push(`<option value="${weapon}-E">${weapon} E</option>`);
+            }
+        }
+
+        return options.join('');
+    }
+
+    /**
+     * Format skill object to string for select value
+     */
+    formatSkillToString(skill) {
+        if (!skill || !skill.weapon || !skill.skill) return '';
+        return `${skill.weapon}-${skill.skill}`;
+    }
+
+    /**
+     * Parse skill string to object
+     */
+    parseSkillString(str) {
+        if (!str) return null;
+        const lastDash = str.lastIndexOf('-');
+        if (lastDash === -1) return null;
+        return {
+            weapon: str.substring(0, lastDash),
+            skill: str.substring(lastDash + 1)
+        };
+    }
+
+    /**
+     * Render common patterns list
+     */
+    renderPatterns(patterns, weaponSlots, onPatternChange, onPatternRemove) {
+        this.elements.patternsList.innerHTML = '';
+
+        if (patterns.length === 0) {
+            this.elements.patternsList.innerHTML = '<div class="patterns-empty">No patterns defined. Click "Add Pattern" to create one.</div>';
+            return;
+        }
+
+        const skillOptions = this.generateSkillOptions(weaponSlots);
+
+        patterns.forEach((pattern, index) => {
+            const item = document.createElement('div');
+            item.className = 'pattern-item';
+            item.dataset.index = index;
+
+            item.innerHTML = `
+                <select class="pattern-select pattern-from" data-index="${index}">
+                    ${skillOptions}
+                </select>
+                <span class="pattern-arrow">→</span>
+                <select class="pattern-select pattern-to" data-index="${index}">
+                    ${skillOptions}
+                </select>
+                <button class="remove-pattern-btn" data-index="${index}">×</button>
+            `;
+
+            // Set current values (convert object to string for select)
+            const fromSelect = item.querySelector('.pattern-from');
+            const toSelect = item.querySelector('.pattern-to');
+
+            fromSelect.value = this.formatSkillToString(pattern.from);
+            toSelect.value = this.formatSkillToString(pattern.to);
+
+            // Event listeners (convert string back to object)
+            fromSelect.addEventListener('change', (e) => {
+                onPatternChange(index, 'from', this.parseSkillString(e.target.value));
+            });
+
+            toSelect.addEventListener('change', (e) => {
+                onPatternChange(index, 'to', this.parseSkillString(e.target.value));
+            });
+
+            item.querySelector('.remove-pattern-btn').addEventListener('click', () => {
+                onPatternRemove(index);
+            });
+
+            this.elements.patternsList.appendChild(item);
+        });
+    }
+
+    /**
+     * Set pattern likelihood input value
+     */
+    setPatternLikelihood(likelihood) {
+        this.elements.patternLikelihoodInput.value = likelihood;
+    }
+
+    /**
+     * Get pattern likelihood from input
+     */
+    getPatternLikelihood() {
+        return parseInt(this.elements.patternLikelihoodInput.value, 10) || 100;
     }
 }

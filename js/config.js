@@ -11,25 +11,63 @@ const CONFIG = {
     ERROR_FLASH_DURATION: 200,
 
     ROUND_SIZE: {
-        DEFAULT: 20,
+        DEFAULT: 50,
         MIN: 1,
         MAX: 9999
     },
 
     FAKE_ATTACKS: {
         DEFAULT_ENABLED: false,
-        DEFAULT_CANCEL_KEY: 'x'
+        DEFAULT_CANCEL_KEY: 'Mouse3'
     },
 
     PRESSURE_MODE: {
         DEFAULT_ENABLED: true,
-        DEFAULT_DRAIN_RATE: 4.0,      // Percentage points per second
+        DEFAULT_DRAIN_RATE: 6.0,      // Percentage points per second
         MIN_DRAIN_RATE: 0.5,
-        MAX_DRAIN_RATE: 5.0,
+        MAX_DRAIN_RATE: 10.0,
         SUCCESS_BOOST: 7.5,           // Percentage boost on success
         ERROR_PENALTY: 25,            // Percentage penalty on error
         WARNING_THRESHOLD: 30,
         CRITICAL_THRESHOLD: 15
+    },
+
+    RHYTHM_MODE: {
+        DEFAULT_NOTE_SPEED: 'slow',     // learning, slower, slow, medium, fast
+        NOTE_SPEEDS: {
+            learning: 5000,  // ms for note to fall
+            slower: 4000,
+            slow: 3200,
+            medium: 2500,
+            fast: 2000
+        },
+        DEFAULT_SPAWN_RATE: 800,        // ms between notes
+        SPAWN_RATES: {
+            learning: 2000,
+            slower: 1600,
+            slow: 1300,
+            medium: 1000,
+            fast: 800
+        },
+        HIT_WINDOW: 200,                // ms before/after target for a hit
+        HIT_LINE_BOTTOM_PX: 100,        // hit line position from bottom (pixels)
+        NOTE_HEIGHT: 60,                // approximate note height for hit detection
+        NOTE_START_OFFSET: 60,          // animation starts this far above container (must match CSS)
+        NOTE_END_OFFSET: 120,           // animation ends this far below container (must match CSS)
+        DEFAULT_DURATION: 60,           // seconds
+        DURATIONS: [30, 60, 90, 0],     // 0 = endless
+        LANE_COUNT: 8
+    },
+
+    COMMON_PATTERNS: {
+        DEFAULT_LIKELIHOOD: 100,  // Percentage chance pattern will be followed
+        DEFAULT_PATTERNS: [
+            { from: { weapon: 'Slasher', skill: 'E' }, to: { weapon: 'Spear', skill: 'Q' } },
+            { from: { weapon: 'Sword', skill: 'E' }, to: { weapon: 'Reaper', skill: 'Q' } },
+            { from: { weapon: 'Axe', skill: 'E' }, to: { weapon: 'Greatsword', skill: 'Q' } },
+            { from: { weapon: 'Reaper', skill: 'E' }, to: { weapon: 'Spear', skill: 'Q' } },
+            { from: { weapon: 'Pistols', skill: 'E' }, to: { weapon: 'Greatsword', skill: 'Q' } }
+        ]
     },
 
     STORAGE_KEYS: {
@@ -40,7 +78,11 @@ const CONFIG = {
         FAKE_ATTACKS_ENABLED: 'fakeAttacksEnabled',
         FAKE_ATTACKS_CANCEL_KEY: 'fakeAttacksCancelKey',
         PRESSURE_MODE_ENABLED: 'pressureModeEnabled',
-        PRESSURE_DRAIN_RATE: 'pressureDrainRate'
+        PRESSURE_DRAIN_RATE: 'pressureDrainRate',
+        RHYTHM_NOTE_SPEED: 'rhythmNoteSpeed',
+        RHYTHM_DURATION: 'rhythmDuration',
+        COMMON_PATTERNS: 'commonPatterns',
+        PATTERN_LIKELIHOOD: 'patternLikelihood'
     }
 };
 
@@ -48,7 +90,8 @@ const SCREENS = {
     WELCOME: 'welcomeScreen',
     COUNTDOWN: 'countdownScreen',
     TRAINING: 'trainingScreen',
-    RESULTS: 'resultsScreen'
+    RESULTS: 'resultsScreen',
+    RHYTHM: 'rhythmScreen'
 };
 
 const KEY_MAPPINGS = {
@@ -106,13 +149,13 @@ const WEAPON_SKILL_IMAGES = {
 };
 
 const DEFAULT_WEAPON_SLOTS = {
-    1: 'LongBow',
+    1: 'Spear',
     2: 'Reaper',
-    3: 'Spear',
+    3: 'LongBow',
     4: 'Axe',
-    5: 'Slasher',
-    6: 'Pistols',
-    7: 'Sword',
+    5: 'Pistols',
+    6: 'Sword',
+    7: 'Slasher',
     8: 'Greatsword'
 };
 
@@ -121,11 +164,11 @@ const DEFAULT_SLOT_KEYBINDINGS = {
     1: '1',
     2: '2',
     3: '3',
-    4: '4',
-    5: '5',
-    6: '6',
-    7: '7',
-    8: '8'
+    4: 'r',
+    5: 'Mouse5',
+    6: 'Mouse4',
+    7: 'x',
+    8: 'c'
 };
 
 // Weapon skills that support fake attacks (weapon-skill pairs)

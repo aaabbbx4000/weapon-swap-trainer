@@ -873,3 +873,356 @@ input[type=number] {
     40% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
     100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
 }
+
+/* Mode Selection Buttons */
+.mode-buttons {
+    display: flex;
+    gap: 15px;
+    width: 100%;
+    justify-content: center;
+}
+
+.mode-buttons .start-button-large {
+    flex: 1;
+    max-width: 200px;
+}
+
+.rhythm-mode-btn {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a24) !important;
+    box-shadow: 0 4px 20px rgba(238, 90, 36, 0.3) !important;
+}
+
+.rhythm-mode-btn:hover {
+    background: linear-gradient(135deg, #ff7675, #ff6348) !important;
+    box-shadow: 0 6px 30px rgba(238, 90, 36, 0.5) !important;
+}
+
+/* Rhythm Mode Screen */
+#rhythmScreen {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+}
+
+.rhythm-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.rhythm-title {
+    font-size: 1.5em;
+    color: #ff6b6b;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+.rhythm-game-area {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.rhythm-lanes-container {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    height: 350px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.rhythm-lane-labels {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 8px 0;
+}
+
+.rhythm-lane-label {
+    flex: 1;
+    text-align: center;
+    font-size: 0.75em;
+    font-weight: bold;
+    color: #00d9ff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 2px;
+}
+
+.rhythm-lanes {
+    position: absolute;
+    top: 40px;
+    bottom: 60px;
+    left: 0;
+    right: 0;
+    display: flex;
+}
+
+.rhythm-lane {
+    flex: 1;
+    position: relative;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.rhythm-lane:last-child {
+    border-right: none;
+}
+
+.rhythm-lane.lane-hit {
+    background: rgba(0, 255, 136, 0.2);
+    transition: background 0.1s;
+}
+
+.rhythm-lane.lane-miss {
+    background: rgba(255, 68, 68, 0.2);
+    transition: background 0.1s;
+}
+
+.rhythm-hit-zone {
+    position: absolute;
+    bottom: 100px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: #00d9ff;
+    box-shadow: 0 0 15px rgba(0, 217, 255, 0.5);
+}
+
+.rhythm-note {
+    position: absolute;
+    width: 70%;
+    aspect-ratio: 1;
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+    background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(238, 90, 36, 0.5);
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.rhythm-note span {
+    transform: rotate(-45deg);
+    font-weight: bold;
+    font-size: 0.55em;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    text-transform: uppercase;
+}
+
+.rhythm-note.note-hit {
+    background: linear-gradient(135deg, #00ff88, #00d9ff);
+    transform: translateX(-50%) rotate(45deg) scale(1.3);
+    opacity: 0;
+    transition: all 0.15s ease-out;
+}
+
+.rhythm-note.note-miss {
+    background: linear-gradient(135deg, #666, #444);
+    opacity: 0.3;
+}
+
+.rhythm-stats {
+    display: flex;
+    gap: 30px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.rhythm-stat {
+    font-size: 1.1em;
+    color: #e4e4e4;
+}
+
+.rhythm-stat span {
+    color: #00d9ff;
+    font-weight: bold;
+    font-family: 'Courier New', monospace;
+}
+
+.rhythm-stat.rhythm-time span {
+    color: #ffd700;
+}
+
+/* Rhythm Results */
+.rhythm-results-title {
+    font-size: 2.5em;
+    color: #ff6b6b;
+    margin-bottom: 10px;
+}
+
+.rhythm-results-subtitle {
+    font-size: 1.2em;
+    color: #b0b0b0;
+    margin-bottom: 30px;
+}
+
+/* Note falling animation */
+@keyframes noteFall {
+    from {
+        top: -60px;
+    }
+    to {
+        top: calc(100% + 120px);
+    }
+}
+
+/* Common Patterns Styles */
+.patterns-button {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad) !important;
+    border-color: #9b59b6 !important;
+    color: #fff !important;
+}
+
+.patterns-button:hover {
+    background: linear-gradient(135deg, #a569c9, #9b59b6) !important;
+    box-shadow: 0 5px 20px rgba(155, 89, 182, 0.4) !important;
+}
+
+.patterns-modal-content {
+    max-width: 650px !important;
+}
+
+.patterns-description {
+    color: #a0a0a0;
+    font-size: 0.95em;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.pattern-likelihood-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: rgba(155, 89, 182, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(155, 89, 182, 0.3);
+    flex-wrap: wrap;
+}
+
+.pattern-likelihood-section label {
+    color: #9b59b6;
+    font-weight: 600;
+}
+
+.likelihood-suffix {
+    color: #e4e4e4;
+}
+
+.likelihood-hint {
+    color: #888;
+    font-size: 0.85em;
+}
+
+.patterns-list-container {
+    max-height: 350px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+}
+
+#patternsList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.pattern-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.pattern-item:hover {
+    border-color: rgba(155, 89, 182, 0.3);
+}
+
+.pattern-select {
+    flex: 1;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(155, 89, 182, 0.5);
+    border-radius: 5px;
+    color: #e4e4e4;
+    font-size: 0.95em;
+    cursor: pointer;
+}
+
+.pattern-select:hover {
+    border-color: #9b59b6;
+}
+
+.pattern-select:focus {
+    outline: none;
+    border-color: #9b59b6;
+    box-shadow: 0 0 10px rgba(155, 89, 182, 0.3);
+}
+
+.pattern-select option {
+    background: #1a1a2e;
+    color: #e4e4e4;
+}
+
+.pattern-arrow {
+    color: #9b59b6;
+    font-size: 1.5em;
+    font-weight: bold;
+    padding: 0 5px;
+}
+
+.remove-pattern-btn {
+    padding: 6px 12px !important;
+    font-size: 0.9em !important;
+    background: rgba(255, 68, 68, 0.1) !important;
+    border-color: #ff4444 !important;
+    color: #ff4444 !important;
+    min-width: auto !important;
+}
+
+.remove-pattern-btn:hover {
+    background: rgba(255, 68, 68, 0.3) !important;
+}
+
+.add-pattern-button {
+    width: 100%;
+    padding: 12px !important;
+    background: linear-gradient(135deg, #9b59b6, #8e44ad) !important;
+    border: none !important;
+    color: #fff !important;
+    font-weight: 600;
+}
+
+.add-pattern-button:hover {
+    background: linear-gradient(135deg, #a569c9, #9b59b6) !important;
+}
+
+.patterns-empty {
+    color: #888;
+    text-align: center;
+    padding: 30px;
+    font-style: italic;
+}

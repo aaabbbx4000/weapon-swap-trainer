@@ -9,6 +9,8 @@ class ComponentManager {
         this.skills = ['Q', 'E'];
         this.fakeAttacksEnabled = false;
         this.cancelKey = 'x';
+        this.commonPatterns = [];
+        this.patternLikelihood = 100;
     }
 
     /**
@@ -17,6 +19,8 @@ class ComponentManager {
     async init() {
         this.weaponSlots = StorageManager.loadWeaponSlots();
         this.slotKeybindings = StorageManager.loadSlotKeybindings();
+        this.commonPatterns = StorageManager.loadCommonPatterns();
+        this.patternLikelihood = StorageManager.loadPatternLikelihood();
     }
 
     /**
@@ -155,7 +159,7 @@ class ComponentManager {
     }
 
     /**
-     * Generate random round of weapon skills
+     * Generate random round of weapon skills (pattern-aware)
      */
     generateRound(size) {
         const components = this.getAllComponents();
@@ -168,9 +172,27 @@ class ComponentManager {
         const availableComponents = [...components];
 
         for (let i = 0; i < size; i++) {
-            const randomIndex = Math.floor(Math.random() * availableComponents.length);
-            round.push(availableComponents[randomIndex]);
-            availableComponents.splice(randomIndex, 1);
+            let selectedComponent;
+
+            // Try to use pattern-aware selection if we have a previous component
+            if (i > 0 && this.commonPatterns.length > 0) {
+                const prevComponent = round[i - 1];
+                selectedComponent = this.selectWithPattern(prevComponent, availableComponents, components);
+            }
+
+            // If no pattern was used, select randomly
+            if (!selectedComponent) {
+                const randomIndex = Math.floor(Math.random() * availableComponents.length);
+                selectedComponent = availableComponents[randomIndex];
+            }
+
+            round.push(selectedComponent);
+
+            // Remove from available pool
+            const indexInAvailable = availableComponents.indexOf(selectedComponent);
+            if (indexInAvailable !== -1) {
+                availableComponents.splice(indexInAvailable, 1);
+            }
 
             if (availableComponents.length === 0) {
                 availableComponents.push(...components);
@@ -178,6 +200,175 @@ class ComponentManager {
         }
 
         return round;
+    }
+
+    /**
+     * Select next component using pattern matching
+     * Returns null if no pattern should be used
+     */
+    selectWithPattern(prevComponent, availableComponents, allComponents) {
+        // Find all patterns that match the previous component
+        const matchingPatterns = this.commonPatterns.filter(p =>
+            p.from &&
+            p.to &&
+            p.from.weapon === prevComponent.weapon &&
+            p.from.skill === prevComponent.skill
+        );
+
+        if (matchingPatterns.length === 0) {
+            return null;
+        }
+
+        // Check if we should follow the pattern based on likelihood
+        if (Math.random() * 100 >= this.patternLikelihood) {
+            return null;
+        }
+
+        // Randomly select one of the matching patterns
+        const selectedPattern = matchingPatterns[Math.floor(Math.random() * matchingPatterns.length)];
+        const targetWeapon = selectedPattern.to.weapon;
+        const targetSkill = selectedPattern.to.skill;
+
+        // Find matching component in available pool first, then all components
+        let targetComponent = availableComponents.find(
+            c => c.weapon === targetWeapon && c.skill === targetSkill && !c.isFake
+        );
+
+        if (!targetComponent) {
+            // Try from all components if not in available pool
+            targetComponent = allComponents.find(
+                c => c.weapon === targetWeapon && c.skill === targetSkill && !c.isFake
+            );
+        }
+
+        return targetComponent || null;
+    }
+
+    /**
+     * Get pattern-aware next lane for rhythm mode
+     * Returns a lane index (1-8) based on patterns, or null for random
+     */
+    getPatternAwareLane(prevLane) {
+        if (!prevLane || this.commonPatterns.length === 0) {
+            return null;
+        }
+
+        // Get the weapon
+        const prevWeapon = this.weaponSlots[prevLane];
+        if (!prevWeapon) {
+            return null;
+        }
+
+        // Check for patterns starting with this weapon (either Q or E)
+        const matchingPatterns = this.commonPatterns.filter(p =>
+            p.from &&
+            p.to &&
+            p.from.weapon === prevWeapon
+        );
+
+        if (matchingPatterns.length === 0) {
+            return null;
+        }
+
+        // Check likelihood
+        if (Math.random() * 100 >= this.patternLikelihood) {
+            return null;
+        }
+
+        // Randomly select a matching pattern
+        const selectedPattern = matchingPatterns[Math.floor(Math.random() * matchingPatterns.length)];
+        const targetWeapon = selectedPattern.to.weapon;
+
+        // Find the lane with this weapon
+        for (let lane = 1; lane <= 8; lane++) {
+            if (this.weaponSlots[lane] === targetWeapon) {
+                return lane;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Get common patterns
+     */
+    getCommonPatterns() {
+        return this.commonPatterns;
+    }
+
+    /**
+     * Set common patterns
+     */
+    setCommonPatterns(patterns) {
+        this.commonPatterns = patterns;
+        StorageManager.saveCommonPatterns(patterns);
+    }
+
+    /**
+     * Get pattern likelihood
+     */
+    getPatternLikelihood() {
+        return this.patternLikelihood;
+    }
+
+    /**
+     * Set pattern likelihood
+     */
+    setPatternLikelihood(likelihood) {
+        this.patternLikelihood = Math.max(0, Math.min(100, likelihood));
+        StorageManager.savePatternLikelihood(this.patternLikelihood);
+    }
+
+    /**
+     * Add a new pattern
+     */
+    addPattern() {
+        this.commonPatterns.push({ from: null, to: null });
+        StorageManager.saveCommonPatterns(this.commonPatterns);
+    }
+
+    /**
+     * Update a pattern field
+     * @param {number} index - Pattern index
+     * @param {string} field - 'from' or 'to'
+     * @param {object} value - { weapon, skill } object or null
+     */
+    updatePattern(index, field, value) {
+        if (index >= 0 && index < this.commonPatterns.length) {
+            this.commonPatterns[index][field] = value;
+            StorageManager.saveCommonPatterns(this.commonPatterns);
+        }
+    }
+
+    /**
+     * Parse skill string to object (for UI compatibility)
+     */
+    parseSkillString(str) {
+        if (!str) return null;
+        const lastDash = str.lastIndexOf('-');
+        if (lastDash === -1) return null;
+        return {
+            weapon: str.substring(0, lastDash),
+            skill: str.substring(lastDash + 1)
+        };
+    }
+
+    /**
+     * Format skill object to string (for UI display)
+     */
+    formatSkillObject(obj) {
+        if (!obj || !obj.weapon || !obj.skill) return '';
+        return `${obj.weapon}-${obj.skill}`;
+    }
+
+    /**
+     * Remove a pattern
+     */
+    removePattern(index) {
+        if (index >= 0 && index < this.commonPatterns.length) {
+            this.commonPatterns.splice(index, 1);
+            StorageManager.saveCommonPatterns(this.commonPatterns);
+        }
     }
 
     /**

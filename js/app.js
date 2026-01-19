@@ -7,23 +7,30 @@ class TrainingApp {
         this.componentManager = new ComponentManager();
         this.statisticsManager = new StatisticsManager();
         this.ui = new UIManager();
+        this.rhythmController = null; // Initialized after componentManager
 
         this.state = {
-            roundSize: StorageManager.loadRoundSize(),
-            fakeAttacksEnabled: StorageManager.loadFakeAttacksEnabled(),
-            fakeAttacksCancelKey: StorageManager.loadFakeAttacksCancelKey(),
-            pressureModeEnabled: StorageManager.loadPressureModeEnabled(),
-            pressureDrainRate: StorageManager.loadPressureDrainRate(),
+            // Round settings (loaded from storage)
+            roundSize: CONFIG.ROUND_SIZE.DEFAULT,
+
+            // Pressure mode settings
+            pressureModeEnabled: false,
+            pressureDrainRate: CONFIG.PRESSURE_MODE.DEFAULT_DRAIN_RATE,
             pressureBar: 100,
             isPressureWarning: false,
             isPressureCritical: false,
+
+            // Training state
             currentRound: [],
             currentComponentIndex: 0,
             currentKeyIndex: 0,
             componentErrors: 0,
             roundResults: [],
             isTraining: false,
-            startTime: null
+            startTime: null,
+
+            // Mode tracking
+            lastModeWasRhythm: false
         };
 
         this.timers = {
@@ -31,6 +38,9 @@ class TrainingApp {
             component: null,
             pressureDrain: null
         };
+
+        // Cleanup functions for event listeners
+        this.cleanupFunctions = [];
     }
 
     /**
@@ -38,17 +48,51 @@ class TrainingApp {
      */
     async init() {
         await this.componentManager.init();
-        this.componentManager.setFakeAttacksConfig(this.state.fakeAttacksEnabled, this.state.fakeAttacksCancelKey);
+
+        // Initialize rhythm controller with dependencies
+        this.rhythmController = new RhythmModeController(
+            this.componentManager,
+            this.ui,
+            CONFIG
+        );
+        this.rhythmController.loadSettings();
+
+        // Load settings from storage
+        this.loadSettings();
+
+        // Sync UI with state
+        this.syncUIWithState();
+
+        // Setup event listeners
+        this.setupEventListeners();
+    }
+
+    /**
+     * Load all settings from storage
+     */
+    loadSettings() {
+        this.state.roundSize = StorageManager.loadRoundSize();
+        this.state.pressureModeEnabled = StorageManager.loadPressureModeEnabled();
+        this.state.pressureDrainRate = StorageManager.loadPressureDrainRate();
+    }
+
+    /**
+     * Sync UI elements with current state
+     */
+    syncUIWithState() {
         this.ui.setRoundSize(this.state.roundSize);
         this.ui.setFakeAttacksSettings(
-            this.state.fakeAttacksEnabled,
-            this.state.fakeAttacksCancelKey
+            this.componentManager.fakeAttacksEnabled,
+            this.componentManager.cancelKey
         );
         this.ui.setPressureModeSettings(
             this.state.pressureModeEnabled,
             this.state.pressureDrainRate
         );
-        this.setupEventListeners();
+        this.ui.setRhythmSettings(
+            this.rhythmController.state.speed,
+            this.rhythmController.state.duration
+        );
     }
 
     /**
@@ -58,12 +102,12 @@ class TrainingApp {
         // Button events
         this.ui.elements.startButton.addEventListener('click', () => this.startRound());
         this.ui.elements.stopButton.addEventListener('click', () => this.stopRound());
-        this.ui.elements.newRoundButton.addEventListener('click', () => this.startRound());
+        this.ui.elements.newRoundButton.addEventListener('click', () => this.handleNewRound());
         this.ui.elements.resetButton.addEventListener('click', () => this.resetPBs());
         this.ui.elements.viewPBsBtn.addEventListener('click', () => this.showPBModal());
         this.ui.elements.configBtn.addEventListener('click', () => this.showConfigModal());
 
-        // Modal events
+        // Modal close events
         document.getElementById('closeModalBtn').addEventListener('click', () => this.closePBModal());
         document.getElementById('closeConfigBtnX').addEventListener('click', () => this.closeConfigModal());
 
@@ -75,69 +119,44 @@ class TrainingApp {
             if (e.target === this.ui.elements.configModal) this.closeConfigModal();
         });
 
+        // Common Patterns modal events
+        this.ui.elements.commonPatternsBtn.addEventListener('click', () => this.showPatternsModal());
+        this.ui.elements.closePatternsBtn.addEventListener('click', () => this.closePatternsModal());
+        this.ui.elements.addPatternBtn.addEventListener('click', () => this.addPattern());
+
+        this.ui.elements.patternsModal.addEventListener('click', (e) => {
+            if (e.target === this.ui.elements.patternsModal) this.closePatternsModal();
+        });
+
+        this.ui.elements.patternLikelihoodInput.addEventListener('blur', (e) => {
+            let value = parseInt(e.target.value, 10);
+            if (isNaN(value)) {
+                value = CONFIG.COMMON_PATTERNS.DEFAULT_LIKELIHOOD;
+            }
+            value = Math.max(0, Math.min(100, value));
+            e.target.value = value;
+            this.componentManager.setPatternLikelihood(value);
+        });
+
         // Settings inputs
         this.ui.elements.roundSizeInput.addEventListener('input', (e) => this.handleRoundSizeInput(e));
         this.ui.elements.roundSizeInput.addEventListener('blur', (e) => this.handleRoundSizeBlur(e));
 
         // Fake attacks settings
         this.ui.elements.fakeAttacksCheckbox.addEventListener('change', (e) => {
-            try {
-                this.state.fakeAttacksEnabled = e.target.checked;
-                StorageManager.saveFakeAttacksEnabled(this.state.fakeAttacksEnabled);
-                this.componentManager.setFakeAttacksConfig(this.state.fakeAttacksEnabled, this.state.fakeAttacksCancelKey);
-            } catch (error) {
+            this.handleFakeAttacksToggle(e.target.checked);
+        });
+
+        // Setup cancel key capture using KeyCapture utility
+        const cancelKeyCleanup = KeyCapture.setupInput(
+            this.ui.elements.cancelKeyInput,
+            (key) => this.handleCancelKeyChange(key),
+            (error) => {
                 alert(error.message);
-                // Revert checkbox
-                e.target.checked = !e.target.checked;
-                this.state.fakeAttacksEnabled = e.target.checked;
+                this.ui.elements.cancelKeyInput.value = this.componentManager.cancelKey;
             }
-        });
-
-        // Capture actual key press for cancel key
-        this.ui.elements.cancelKeyInput.addEventListener('keydown', (e) => {
-            e.preventDefault();
-            const key = this.ui.getKeyName(e);
-            if (key) {
-                try {
-                    this.state.fakeAttacksCancelKey = key;
-                    StorageManager.saveFakeAttacksCancelKey(this.state.fakeAttacksCancelKey);
-                    this.componentManager.setFakeAttacksConfig(this.state.fakeAttacksEnabled, this.state.fakeAttacksCancelKey);
-                    e.target.value = key;
-                } catch (error) {
-                    alert(error.message);
-                    // Revert to previous value
-                    e.target.value = this.state.fakeAttacksCancelKey;
-                }
-            }
-        });
-
-        // Capture mouse button for cancel key (but not the initial click to focus)
-        this.ui.elements.cancelKeyInput.addEventListener('mousedown', (e) => {
-            if (!document.activeElement || document.activeElement !== this.ui.elements.cancelKeyInput) {
-                // This is the initial click to focus - allow it
-                return;
-            }
-
-            // Input is already focused - capture this as a binding
-            e.preventDefault();
-            const buttonName = this.ui.getMouseButtonName(e);
-            try {
-                this.state.fakeAttacksCancelKey = buttonName;
-                StorageManager.saveFakeAttacksCancelKey(this.state.fakeAttacksCancelKey);
-                this.componentManager.setFakeAttacksConfig(this.state.fakeAttacksEnabled, this.state.fakeAttacksCancelKey);
-                e.target.value = buttonName;
-                e.target.blur();
-            } catch (error) {
-                alert(error.message);
-                // Revert to previous value
-                e.target.value = this.state.fakeAttacksCancelKey;
-            }
-        });
-
-        // Prevent context menu on cancel key input
-        this.ui.elements.cancelKeyInput.addEventListener('contextmenu', (e) => {
-            e.preventDefault();
-        });
+        );
+        this.cleanupFunctions.push(cancelKeyCleanup);
 
         // Pressure mode settings
         this.ui.elements.pressureModeCheckbox.addEventListener('change', (e) => {
@@ -150,23 +169,62 @@ class TrainingApp {
             if (isNaN(value)) {
                 value = CONFIG.PRESSURE_MODE.DEFAULT_DRAIN_RATE;
             }
-            value = Math.max(CONFIG.PRESSURE_MODE.MIN_DRAIN_RATE, Math.min(CONFIG.PRESSURE_MODE.MAX_DRAIN_RATE, value));
+            value = Math.max(CONFIG.PRESSURE_MODE.MIN_DRAIN_RATE,
+                Math.min(CONFIG.PRESSURE_MODE.MAX_DRAIN_RATE, value));
             e.target.value = value.toFixed(1);
             this.state.pressureDrainRate = value;
             StorageManager.savePressureDrainRate(value);
         });
 
-        // Keyboard events
+        // Rhythm mode events
+        this.ui.elements.rhythmModeButton.addEventListener('click', () => this.startRhythmMode());
+        this.ui.elements.stopRhythmButton.addEventListener('click', () => this.stopRhythmMode());
+
+        this.ui.elements.rhythmSpeedSelect.addEventListener('change', (e) => {
+            this.rhythmController.saveSettings(e.target.value, undefined);
+        });
+
+        this.ui.elements.rhythmDurationSelect.addEventListener('change', (e) => {
+            this.rhythmController.saveSettings(undefined, parseInt(e.target.value, 10));
+        });
+
+        // Global input events
         document.addEventListener('keydown', (e) => this.handleKeyDown(e));
         document.addEventListener('mousedown', (e) => this.handleMouseDown(e));
-
-        // Prevent context menu during training
         document.addEventListener('contextmenu', (e) => {
-            if (this.state.isTraining) {
+            if (this.state.isTraining || this.rhythmController.isActive()) {
                 e.preventDefault();
             }
         });
     }
+
+    // ==================== Fake Attacks Handling ====================
+
+    /**
+     * Handle fake attacks checkbox toggle
+     */
+    handleFakeAttacksToggle(enabled) {
+        try {
+            this.componentManager.setFakeAttacksConfig(enabled, this.componentManager.cancelKey);
+            StorageManager.saveFakeAttacksEnabled(enabled);
+        } catch (error) {
+            alert(error.message);
+            this.ui.elements.fakeAttacksCheckbox.checked = !enabled;
+        }
+    }
+
+    /**
+     * Handle cancel key change
+     */
+    handleCancelKeyChange(key) {
+        this.componentManager.setFakeAttacksConfig(
+            this.componentManager.fakeAttacksEnabled,
+            key
+        );
+        StorageManager.saveFakeAttacksCancelKey(key);
+    }
+
+    // ==================== Training Mode ====================
 
     /**
      * Start a new training round
@@ -175,7 +233,8 @@ class TrainingApp {
         try {
             this.state.roundSize = this.ui.getRoundSize();
 
-            if (this.state.roundSize < CONFIG.ROUND_SIZE.MIN || this.state.roundSize > CONFIG.ROUND_SIZE.MAX) {
+            if (this.state.roundSize < CONFIG.ROUND_SIZE.MIN ||
+                this.state.roundSize > CONFIG.ROUND_SIZE.MAX) {
                 alert(`Round size must be between ${CONFIG.ROUND_SIZE.MIN} and ${CONFIG.ROUND_SIZE.MAX}`);
                 return;
             }
@@ -186,7 +245,7 @@ class TrainingApp {
             this.state.currentComponentIndex = 0;
             this.state.roundResults = [];
 
-            // Initialize pressure mode if enabled
+            // Initialize pressure mode
             if (this.state.pressureModeEnabled) {
                 this.state.pressureBar = 100;
                 this.state.isPressureWarning = false;
@@ -231,7 +290,6 @@ class TrainingApp {
 
         const component = this.state.currentRound[this.state.currentComponentIndex];
 
-        // Update component display
         this.ui.updateComponent(
             component,
             this.state.currentComponentIndex,
@@ -330,13 +388,18 @@ class TrainingApp {
      * Show results screen
      */
     showResults() {
+        this.state.lastModeWasRhythm = false;
+        this.clearTimer('pressureDrain');
         this.ui.showScreen(SCREENS.RESULTS);
         this.ui.toggleTrainingButtons(false);
         this.ui.showTimesSidebar(false);
+        this.ui.hidePressureBar();
 
         const stats = this.statisticsManager.calculateRoundStats(this.state.roundResults);
         this.ui.showResults(this.state.roundResults, stats, this.state.roundSize);
     }
+
+    // ==================== Pressure Mode ====================
 
     /**
      * Start pressure drain timer
@@ -348,10 +411,12 @@ class TrainingApp {
             this.state.pressureBar = Math.max(0, this.state.pressureBar - drainPerTick);
             this.ui.updatePressureBar(this.state.pressureBar);
 
-            if (this.state.pressureBar <= CONFIG.PRESSURE_MODE.CRITICAL_THRESHOLD && !this.state.isPressureCritical) {
+            if (this.state.pressureBar <= CONFIG.PRESSURE_MODE.CRITICAL_THRESHOLD &&
+                !this.state.isPressureCritical) {
                 this.state.isPressureCritical = true;
                 this.ui.setPressureBarCritical();
-            } else if (this.state.pressureBar <= CONFIG.PRESSURE_MODE.WARNING_THRESHOLD && !this.state.isPressureWarning) {
+            } else if (this.state.pressureBar <= CONFIG.PRESSURE_MODE.WARNING_THRESHOLD &&
+                !this.state.isPressureWarning) {
                 this.state.isPressureWarning = true;
                 this.ui.setPressureBarWarning();
             }
@@ -381,7 +446,8 @@ class TrainingApp {
     boostPressureBar() {
         if (!this.state.pressureModeEnabled) return;
 
-        this.state.pressureBar = Math.min(100, this.state.pressureBar + CONFIG.PRESSURE_MODE.SUCCESS_BOOST);
+        this.state.pressureBar = Math.min(100,
+            this.state.pressureBar + CONFIG.PRESSURE_MODE.SUCCESS_BOOST);
 
         if (this.state.pressureBar > CONFIG.PRESSURE_MODE.WARNING_THRESHOLD) {
             this.state.isPressureWarning = false;
@@ -401,7 +467,8 @@ class TrainingApp {
     penalizePressureBar() {
         if (!this.state.pressureModeEnabled) return;
 
-        this.state.pressureBar = Math.max(0, this.state.pressureBar - CONFIG.PRESSURE_MODE.ERROR_PENALTY);
+        this.state.pressureBar = Math.max(0,
+            this.state.pressureBar - CONFIG.PRESSURE_MODE.ERROR_PENALTY);
         this.ui.updatePressureBar(this.state.pressureBar);
 
         if (this.state.pressureBar <= 0) {
@@ -409,26 +476,51 @@ class TrainingApp {
         }
     }
 
+    // ==================== Input Handling ====================
+
     /**
      * Handle keyboard input
      */
     handleKeyDown(e) {
+        // Prevent default for special keys when not in input
+        const isInput = e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA';
+        if (!isInput) {
+            const preventKeys = ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8',
+                'F9', 'F10', 'F11', 'F12', 'Backspace', ' '];
+            if (preventKeys.includes(e.key)) {
+                e.preventDefault();
+            }
+        }
+
+        // Escape handling
         if (e.key === 'Escape') {
             if (this.ui.elements.pbModal.style.display === 'flex') {
                 this.closePBModal();
             } else if (this.ui.elements.configModal.style.display === 'flex') {
                 this.closeConfigModal();
+            } else if (this.ui.elements.patternsModal.style.display === 'flex') {
+                this.closePatternsModal();
+            } else if (this.rhythmController.isActive()) {
+                this.stopRhythmMode();
             }
             return;
         }
 
+        // Rhythm mode input
+        if (this.rhythmController.isActive()) {
+            e.preventDefault();
+            const key = KeyCapture.getKeyName(e);
+            if (key) {
+                this.rhythmController.processInput(key);
+            }
+            return;
+        }
+
+        // Training mode input
         if (!this.state.isTraining) return;
 
-        // Prevent default browser behavior for all keys during training
         e.preventDefault();
-
-        // Use the same key naming as keybindings
-        const key = this.ui.getKeyName(e);
+        const key = KeyCapture.getKeyName(e);
         if (key) {
             this.processKeyInput(key);
         }
@@ -438,28 +530,38 @@ class TrainingApp {
      * Handle mouse input
      */
     handleMouseDown(e) {
-        if (!this.state.isTraining) return;
+        // Prevent browser back/forward navigation
+        if (e.button === 3 || e.button === 4) {
+            e.preventDefault();
+        }
 
-        // Don't process clicks on UI buttons or interactive elements
+        // Don't process clicks on UI elements
         const target = e.target;
         if (target.tagName === 'BUTTON' ||
             target.tagName === 'INPUT' ||
             target.closest('button') ||
             target.closest('.modal') ||
             target.closest('.settings-button')) {
-            return; // Let the UI handle this click normally
+            return;
         }
 
-        // Prevent default browser behavior during training (e.g., context menu)
-        e.preventDefault();
+        // Rhythm mode mouse input
+        if (this.rhythmController.isActive()) {
+            e.preventDefault();
+            const buttonName = KeyCapture.getMouseButtonName(e);
+            this.rhythmController.processInput(buttonName);
+            return;
+        }
 
-        // Use the same mouse button naming as keybindings
-        const buttonName = this.ui.getMouseButtonName(e);
+        // Training mode mouse input
+        if (!this.state.isTraining) return;
+        e.preventDefault();
+        const buttonName = KeyCapture.getMouseButtonName(e);
         this.processKeyInput(buttonName);
     }
 
     /**
-     * Process key/mouse input
+     * Process key/mouse input for training
      */
     processKeyInput(inputKey) {
         const component = this.state.currentRound[this.state.currentComponentIndex];
@@ -471,11 +573,8 @@ class TrainingApp {
             this.ui.updateKeyIndicators(requiredKeys, this.state.currentKeyIndex);
             this.checkCompletion(requiredKeys);
         } else {
-            // Handle error
             if (this.state.pressureModeEnabled) {
                 this.penalizePressureBar();
-                // Don't reset in pressure mode, let them continue
-                return;
             } else {
                 this.state.componentErrors++;
                 this.ui.flashKeyError(requiredKeys, () => {
@@ -494,6 +593,54 @@ class TrainingApp {
             this.completeComponent();
         }
     }
+
+    // ==================== Rhythm Mode ====================
+
+    /**
+     * Start rhythm mode
+     */
+    startRhythmMode() {
+        this.rhythmController.start((stats) => {
+            this.state.lastModeWasRhythm = true;
+            this.ui.showScreen(SCREENS.RESULTS);
+        });
+
+        this.ui.showScreen(SCREENS.COUNTDOWN);
+        this.startRhythmCountdown();
+    }
+
+    /**
+     * Start rhythm countdown
+     */
+    startRhythmCountdown() {
+        let count = CONFIG.COUNTDOWN_START;
+        this.ui.updateCountdown(count);
+
+        this.timers.countdown = setInterval(() => {
+            count--;
+            if (count > 0) {
+                this.ui.updateCountdown(count);
+            } else {
+                this.clearTimer('countdown');
+                this.ui.showScreen(SCREENS.RHYTHM);
+                this.rhythmController.beginGame();
+            }
+        }, CONFIG.COUNTDOWN_INTERVAL);
+    }
+
+    /**
+     * Stop rhythm mode
+     */
+    stopRhythmMode() {
+        this.clearTimer('countdown');
+        this.rhythmController.stop();
+
+        if (!this.rhythmController.state.hits && !this.rhythmController.state.misses) {
+            this.ui.showScreen(SCREENS.WELCOME);
+        }
+    }
+
+    // ==================== Modal Handlers ====================
 
     /**
      * Show PB modal
@@ -527,6 +674,22 @@ class TrainingApp {
     }
 
     /**
+     * Show patterns modal
+     */
+    showPatternsModal() {
+        this.renderPatterns();
+        this.ui.setPatternLikelihood(this.componentManager.getPatternLikelihood());
+        this.ui.showModal(this.ui.elements.patternsModal, true);
+    }
+
+    /**
+     * Close patterns modal
+     */
+    closePatternsModal() {
+        this.ui.showModal(this.ui.elements.patternsModal, false);
+    }
+
+    /**
      * Render weapon slots configuration
      */
     renderWeaponSlots() {
@@ -535,13 +698,46 @@ class TrainingApp {
         this.ui.renderWeaponSlots(
             weaponSlots,
             slotKeybindings,
-            (slot, weaponName) => {
-                this.handleWeaponSlotChange(slot, weaponName);
-            },
-            (slot, key) => {
-                this.handleSlotKeybindingChange(slot, key);
-            }
+            (slot, weaponName) => this.handleWeaponSlotChange(slot, weaponName),
+            (slot, key) => this.handleSlotKeybindingChange(slot, key)
         );
+    }
+
+    /**
+     * Render patterns list
+     */
+    renderPatterns() {
+        const patterns = this.componentManager.getCommonPatterns();
+        const weaponSlots = this.componentManager.getWeaponSlots();
+        this.ui.renderPatterns(
+            patterns,
+            weaponSlots,
+            (index, field, value) => this.handlePatternChange(index, field, value),
+            (index) => this.handlePatternRemove(index)
+        );
+    }
+
+    /**
+     * Handle pattern change
+     */
+    handlePatternChange(index, field, value) {
+        this.componentManager.updatePattern(index, field, value);
+    }
+
+    /**
+     * Handle pattern removal
+     */
+    handlePatternRemove(index) {
+        this.componentManager.removePattern(index);
+        this.renderPatterns();
+    }
+
+    /**
+     * Add new pattern
+     */
+    addPattern() {
+        this.componentManager.addPattern();
+        this.renderPatterns();
     }
 
     /**
@@ -580,6 +776,8 @@ class TrainingApp {
         }
     }
 
+    // ==================== Settings Handlers ====================
+
     /**
      * Handle round size input
      */
@@ -613,6 +811,21 @@ class TrainingApp {
     }
 
     /**
+     * Handle new round button click
+     */
+    handleNewRound() {
+        if (this.state.lastModeWasRhythm) {
+            this.state.lastModeWasRhythm = false;
+            this.ui.resetResultsScreen();
+            this.ui.showScreen(SCREENS.WELCOME);
+        } else {
+            this.startRound();
+        }
+    }
+
+    // ==================== Utilities ====================
+
+    /**
      * Clear a timer
      */
     clearTimer(timerName) {
@@ -620,6 +833,14 @@ class TrainingApp {
             clearInterval(this.timers[timerName]);
             this.timers[timerName] = null;
         }
+    }
+
+    /**
+     * Cleanup on destroy
+     */
+    destroy() {
+        this.cleanupFunctions.forEach(cleanup => cleanup());
+        Object.keys(this.timers).forEach(key => this.clearTimer(key));
     }
 }
 

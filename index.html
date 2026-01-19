@@ -45,7 +45,10 @@
                     </div>
                 </div>
                 <div class="welcome-controls">
-                    <button id="startButton" class="start-button-large">Start Training</button>
+                    <div class="mode-buttons">
+                        <button id="startButton" class="start-button-large">Skill Training</button>
+                        <button id="rhythmModeButton" class="start-button-large rhythm-mode-btn">Rhythm Mode</button>
+                    </div>
                     <div class="round-size-control-inline">
                         <label for="roundSizeInput">Round Size:</label>
                         <input type="number" id="roundSizeInput" min="1" max="9999" value="20">
@@ -67,12 +70,12 @@
                     <button id="stopButton" class="stop-button-inline">Stop Round</button>
                 </div>
                 <div class="weapon-display">
-                    <div id="weaponName" class="weapon-name">Weapon</div>
-                    <div id="keyIndicators"></div>
                     <div style="position: relative; display: inline-block;">
                         <img id="weaponImage" class="weapon-image" src="" alt="Weapon">
                         <div id="fakeOverlay" style="display: none; position: absolute; top: 15%; left: 50%; transform: translateX(-50%); color: red; font-size: 48px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8); pointer-events: none; z-index: 10;">FAKE</div>
                     </div>
+                    <div id="keyIndicators"></div>
+                    <div id="weaponName" class="weapon-name">Weapon</div>
                 </div>
                 <div class="training-footer">
                     <div class="timer" id="timer">0.0s</div>
@@ -114,6 +117,27 @@
                     <div id="resultsList"></div>
                 </div>
             </div>
+
+            <!-- Rhythm Mode Screen -->
+            <div id="rhythmScreen" class="hidden">
+                <div class="rhythm-header">
+                    <div class="rhythm-title">RHYTHM MODE</div>
+                    <button id="stopRhythmButton" class="stop-button-inline">Stop</button>
+                </div>
+                <div class="rhythm-game-area">
+                    <div class="rhythm-lanes-container" id="rhythmLanesContainer">
+                        <div class="rhythm-lane-labels" id="rhythmLaneLabels"></div>
+                        <div class="rhythm-lanes" id="rhythmLanes"></div>
+                        <div class="rhythm-hit-zone" id="rhythmHitZone"></div>
+                    </div>
+                </div>
+                <div class="rhythm-stats">
+                    <span class="rhythm-stat">Hits: <span id="rhythmHits">0</span></span>
+                    <span class="rhythm-stat">Misses: <span id="rhythmMisses">0</span></span>
+                    <span class="rhythm-stat">Accuracy: <span id="rhythmAccuracy">100%</span></span>
+                    <span class="rhythm-stat rhythm-time">Time: <span id="rhythmTime">60</span>s</span>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -140,6 +164,11 @@
         <div class="modal-content">
             <button class="modal-close-x" id="closeConfigBtnX">&times;</button>
             <div class="modal-header">Configure Weapons</div>
+
+            <!-- Common Patterns Button -->
+            <div class="config-buttons">
+                <button id="commonPatternsBtn" class="patterns-button">Common Patterns</button>
+            </div>
 
             <!-- Weapon Slots Configuration -->
             <div class="config-section">
@@ -185,16 +214,70 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Rhythm Mode Settings -->
+                <div class="rhythm-mode-section" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #444;">
+                    <h4 style="color: #00d9ff; margin-bottom: 15px;">Rhythm Mode Settings</h4>
+                    <div style="margin-bottom: 10px;">
+                        <label for="rhythmSpeedSelect">Note Speed:</label>
+                        <select id="rhythmSpeedSelect" style="width: 120px; margin-left: 10px;">
+                            <option value="learning">Learning</option>
+                            <option value="slower">Slower</option>
+                            <option value="slow" selected>Slow</option>
+                            <option value="medium">Medium</option>
+                            <option value="fast">Fast</option>
+                        </select>
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <label for="rhythmDurationSelect">Duration:</label>
+                        <select id="rhythmDurationSelect" style="width: 120px; margin-left: 10px;">
+                            <option value="30">30 seconds</option>
+                            <option value="60" selected>60 seconds</option>
+                            <option value="90">90 seconds</option>
+                            <option value="0">Endless</option>
+                        </select>
+                    </div>
+                </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Common Patterns Modal -->
+    <div id="patternsModal" class="modal hidden">
+        <div class="modal-content patterns-modal-content">
+            <button class="modal-close-x" id="closePatternsBtn">&times;</button>
+            <div class="modal-header">Common Patterns</div>
+            <p class="patterns-description">
+                Define weapon swap patterns to influence skill selection order.
+                When a pattern matches, the next skill has a higher chance of following the pattern.
+            </p>
+
+            <!-- Likelihood Setting -->
+            <div class="pattern-likelihood-section">
+                <label for="patternLikelihoodInput">Pattern Likelihood:</label>
+                <input type="number" id="patternLikelihoodInput" min="0" max="100" value="100" style="width: 70px; text-align: center;">
+                <span class="likelihood-suffix">%</span>
+                <span class="likelihood-hint">(chance to follow a matching pattern)</span>
+            </div>
+
+            <!-- Patterns List -->
+            <div class="patterns-list-container">
+                <div id="patternsList"></div>
+            </div>
+
+            <!-- Add Pattern Button -->
+            <button id="addPatternBtn" class="add-pattern-button">+ Add Pattern</button>
         </div>
     </div>
 
     <!-- JavaScript -->
     <script src="js/config.js"></script>
     <script src="js/storage.js"></script>
+    <script src="js/key-capture.js"></script>
     <script src="js/statistics-manager.js"></script>
     <script src="js/component-manager.js"></script>
     <script src="js/ui-manager.js"></script>
+    <script src="js/rhythm-controller.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>

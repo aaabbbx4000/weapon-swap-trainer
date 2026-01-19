@@ -53,7 +53,7 @@ class StorageManager {
      */
     static loadFakeAttacksEnabled() {
         const saved = localStorage.getItem(CONFIG.STORAGE_KEYS.FAKE_ATTACKS_ENABLED);
-        return saved === 'true';
+        return saved !== null ? saved === 'true' : CONFIG.FAKE_ATTACKS.DEFAULT_ENABLED;
     }
 
     /**
@@ -83,7 +83,7 @@ class StorageManager {
      */
     static loadPressureModeEnabled() {
         const saved = localStorage.getItem(CONFIG.STORAGE_KEYS.PRESSURE_MODE_ENABLED);
-        return saved === 'true';
+        return saved !== null ? saved === 'true' : CONFIG.PRESSURE_MODE.DEFAULT_ENABLED;
     }
 
     /**
@@ -121,5 +121,91 @@ class StorageManager {
      */
     static saveSlotKeybindings(slotKeybindings) {
         localStorage.setItem(CONFIG.STORAGE_KEYS.SLOT_KEYBINDINGS, JSON.stringify(slotKeybindings));
+    }
+
+    /**
+     * Load common patterns from localStorage
+     * Returns array of pattern objects: [{ from: { weapon, skill }, to: { weapon, skill } }, ...]
+     */
+    static loadCommonPatterns() {
+        const saved = localStorage.getItem(CONFIG.STORAGE_KEYS.COMMON_PATTERNS);
+        if (!saved) return [...CONFIG.COMMON_PATTERNS.DEFAULT_PATTERNS];
+
+        const patterns = JSON.parse(saved);
+
+        // Migrate old string format to object format
+        return patterns.map(p => this.migratePattern(p));
+    }
+
+    /**
+     * Migrate old string pattern format to object format
+     */
+    static migratePattern(pattern) {
+        // Already in new format
+        if (pattern.from && typeof pattern.from === 'object') {
+            return pattern;
+        }
+
+        // Convert string format "Weapon-Skill" to object { weapon, skill }
+        const parseSkillString = (str) => {
+            if (!str) return null;
+            const lastDash = str.lastIndexOf('-');
+            if (lastDash === -1) return null;
+            return {
+                weapon: str.substring(0, lastDash),
+                skill: str.substring(lastDash + 1)
+            };
+        };
+
+        return {
+            from: parseSkillString(pattern.from),
+            to: parseSkillString(pattern.to)
+        };
+    }
+
+    /**
+     * Save common patterns to localStorage
+     */
+    static saveCommonPatterns(patterns) {
+        localStorage.setItem(CONFIG.STORAGE_KEYS.COMMON_PATTERNS, JSON.stringify(patterns));
+    }
+
+    /**
+     * Load pattern likelihood from localStorage
+     */
+    static loadPatternLikelihood() {
+        const saved = localStorage.getItem(CONFIG.STORAGE_KEYS.PATTERN_LIKELIHOOD);
+        return saved ? parseInt(saved, 10) : CONFIG.COMMON_PATTERNS.DEFAULT_LIKELIHOOD;
+    }
+
+    /**
+     * Save pattern likelihood to localStorage
+     */
+    static savePatternLikelihood(likelihood) {
+        localStorage.setItem(CONFIG.STORAGE_KEYS.PATTERN_LIKELIHOOD, likelihood.toString());
+    }
+
+    /**
+     * Generic load from localStorage
+     */
+    static load(key) {
+        const saved = localStorage.getItem(key);
+        if (!saved) return null;
+        try {
+            return JSON.parse(saved);
+        } catch {
+            return saved;
+        }
+    }
+
+    /**
+     * Generic save to localStorage
+     */
+    static save(key, value) {
+        if (typeof value === 'object') {
+            localStorage.setItem(key, JSON.stringify(value));
+        } else {
+            localStorage.setItem(key, value.toString());
+        }
     }
 }
